@@ -1,0 +1,17 @@
+.credit-card {
+   border-left: 4px solid #0d6efd;
+}
+
+.one-time-card {
+   border-left: 4px solid #198754;
+}
+
+.payment-progress {
+   height: 8px;
+}
+
+.btn-danger {
+   padding: 0.15rem 0.4rem;
+   font-size: 1.1rem;
+   line-height: 1.2;
+}
