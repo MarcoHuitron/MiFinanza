@@ -3,12 +3,9 @@ let finances = {
    monthlyIncome: 0,
    creditPurchases: [],
    oneTimePurchases: [],
-   currentMonth: new Date().getMonth(),
-   currentYear: new Date().getFullYear(),
-   history: { } // { "2023-11": { creditPurchases: [], oneTimePurchases: [], totalSpent: 0, income: 0 } }
+   
 };
 
-// 2. Modifica loadData()
 function loadData() {
    const saved = localStorage.getItem('finances');
    if (saved) {
@@ -18,15 +15,7 @@ function loadData() {
            // Inicializar propiedades si no existen
            if (!finances.creditPurchases) finances.creditPurchases = [];
            if (!finances.oneTimePurchases) finances.oneTimePurchases = [];
-           if (!finances.history) finances.history = {};
            
-           // Verificar fechas actuales
-           const now = new Date();
-           finances.currentMonth = finances.currentMonth !== undefined ? finances.currentMonth : now.getMonth();
-           finances.currentYear = finances.currentYear !== undefined ? finances.currentYear : now.getFullYear();
-           
-           // Verificar cambio de mes
-           checkMonthChange();
        } catch (e) {
            console.error("Error al cargar datos:", e);
            // Restablecer datos si hay error
@@ -34,52 +23,18 @@ function loadData() {
                monthlyIncome: 0,
                creditPurchases: [],
                oneTimePurchases: [],
-               currentMonth: new Date().getMonth(),
-               currentYear: new Date().getFullYear(),
-               history: {}
+            
            };
        }
    }
-   finances.monthlyIncome = finances.monthlyIncome || 0;
    updateUI();
 }
 
-// 3. Añade esta nueva función para manejar el cambio de mes
-function checkMonthChange() {
-   const now = new Date();
-   const currentMonth = now.getMonth();
-   const currentYear = now.getFullYear();
-   
-   // Solo proceder si realmente cambió el mes
-   if (finances.currentMonth !== currentMonth || finances.currentYear !== currentYear) {
-       // Crear clave para el historial (formato YYYY-MM)
-       const monthKey = `${finances.currentYear}-${String(finances.currentMonth + 1).padStart(2, '0')}`;
-       
-       // Solo guardar en historial si hay datos
-       if (finances.creditPurchases.length > 0 || finances.oneTimePurchases.length > 0) {
-           finances.history[monthKey] = {
-               creditPurchases: JSON.parse(JSON.stringify(finances.creditPurchases)),
-               oneTimePurchases: JSON.parse(JSON.stringify(finances.oneTimePurchases)),
-               totalSpent: calculateTotalExpenses(),
-               income: finances.monthlyIncome
-           };
-       }
-       
-       // Reiniciar datos para el nuevo mes
-       finances.creditPurchases = [];
-       finances.oneTimePurchases = [];
-       finances.currentMonth = currentMonth;
-       finances.currentYear = currentYear;
-       
-       saveData();
-   }
-}
+
 
 // 4. Modifica updateUI() para incluir el historial
 function updateUI() {
-   checkMonthChange(); // Verificar cambio de mes en cada actualización
    
-   document.getElementById('incomeAmount').textContent = `${finances.monthlyIncome.toLocaleString()}`;
 
    const totalExpenses = calculateTotalExpenses();
    document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2);
@@ -89,12 +44,8 @@ function updateUI() {
    progressBar.style.width = `${progress}%`;
    progressBar.textContent = `${progress.toFixed(1)}%`;
 
-   const remaining = finances.monthlyIncome - totalExpenses;
-   document.getElementById('remainingMoney').textContent = remaining.toFixed(2);
-
    renderCreditList();
    renderOneTimeList();
-   renderHistory(); // Mostrar el historial
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -105,58 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
    document.getElementById('oneTimeList').addEventListener('click', handleOneTimeActions);
 });
 
-// 5. Añade esta nueva función para mostrar el historial
-function renderHistory() {
-   const historyContainer = document.getElementById('historyContainer');
-   if (!historyContainer) return;
-   
-   // Ordenar historial por fecha (más reciente primero)
-   const sortedHistory = Object.entries(finances.history).sort((a, b) => b[0].localeCompare(a[0]));
-   
-   historyContainer.innerHTML = sortedHistory.map(([monthKey, data]) => {
-       const [year, month] = monthKey.split('-');
-       const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
-                         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-       
-       // Validar que el mes sea un número válido
-       const monthIndex = parseInt(month) - 1;
-       const monthName = monthNames[monthIndex] || `Mes ${month}`;
-       
-       return `
-       <div class="card mb-3">
-           <div class="card-header">
-               <h5>${monthName} ${year}</h5>
-               <div class="d-flex justify-content-between">
-                   <span>Ingresos: $${data.income.toLocaleString()}</span>
-                   <span>Gastos: $${data.totalSpent.toLocaleString()}</span>
-                   <span>Balance: $${(data.income - data.totalSpent).toLocaleString()}</span>
-               </div>
-           </div>
-           <div class="card-body">
-               <h6>Compras a crédito</h6>
-               ${data.creditPurchases.length > 0 ? 
-                 data.creditPurchases.map(purchase => `
-                   <div class="d-flex justify-content-between border-bottom py-2">
-                       <span>${purchase.name} (${purchase.cardName})</span>
-                       <span>$${purchase.total.toLocaleString()} (${purchase.paid}/${purchase.installments} pagos)</span>
-                   </div>
-                 `).join('') : 
-                 '<p class="text-muted">No hubo compras a crédito</p>'}
-               
-               <h6 class="mt-3">Compras únicas</h6>
-               ${data.oneTimePurchases.length > 0 ? 
-                 data.oneTimePurchases.map(purchase => `
-                   <div class="d-flex justify-content-between border-bottom py-2">
-                       <span>${purchase.name} ${purchase.paymentMethod === 'debito' ? `(${purchase.cardName})` : ''}</span>
-                       <span>$${purchase.total.toLocaleString()}</span>
-                   </div>
-                 `).join('') : 
-                 '<p class="text-muted">No hubo compras únicas</p>'}
-           </div>
-       </div>
-       `;
-   }).join('') || '<p class="text-muted">No hay historial disponible</p>';
-}
 
 
 function updateIncome() {
