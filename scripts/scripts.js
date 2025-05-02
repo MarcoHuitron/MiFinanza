@@ -1,9 +1,7 @@
-// 1. Actualiza el objeto finances
 let finances = {
    monthlyIncome: 0,
    creditPurchases: [],
    oneTimePurchases: [],
-   
 };
 
 function loadData() {
@@ -11,38 +9,32 @@ function loadData() {
    if (saved) {
        try {
            finances = JSON.parse(saved);
-           
-           // Inicializar propiedades si no existen
            if (!finances.creditPurchases) finances.creditPurchases = [];
            if (!finances.oneTimePurchases) finances.oneTimePurchases = [];
-           
        } catch (e) {
            console.error("Error al cargar datos:", e);
-           // Restablecer datos si hay error
-           finances = {
-               monthlyIncome: 0,
-               creditPurchases: [],
-               oneTimePurchases: [],
-            
-           };
+           finances = { monthlyIncome: 0, creditPurchases: [], oneTimePurchases: [] };
        }
    }
    updateUI();
 }
 
-
-
-// 4. Modifica updateUI() para incluir el historial
 function updateUI() {
-   
+   // Mostrar ingresos mensuales
+   document.getElementById('incomeAmount').textContent = finances.monthlyIncome.toFixed(2);
 
    const totalExpenses = calculateTotalExpenses();
    document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2);
 
-   const progress = (totalExpenses / finances.monthlyIncome) * 100;
+   // Actualizar barra de progreso (evitar NaN o infinito)
    const progressBar = document.getElementById('progressBar');
-   progressBar.style.width = `${progress}%`;
+   const progress = finances.monthlyIncome > 0 ? (totalExpenses / finances.monthlyIncome) * 100 : 0;
+   progressBar.style.width = `${Math.min(progress, 100)}%`;
    progressBar.textContent = `${progress.toFixed(1)}%`;
+
+   // Mostrar restante
+   const remaining = finances.monthlyIncome - totalExpenses;
+   document.getElementById('remainingMoney').textContent = remaining.toFixed(2);
 
    renderCreditList();
    renderOneTimeList();
@@ -56,8 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
    document.getElementById('oneTimeList').addEventListener('click', handleOneTimeActions);
 });
 
-
-
 function updateIncome() {
    const newIncome = parseFloat(document.getElementById('newIncome').value);
    if (isNaN(newIncome) || newIncome <= 0) {
@@ -68,7 +58,6 @@ function updateIncome() {
    saveData();
    updateUI();
 
-   // Cerrar el modal
    const modal = bootstrap.Modal.getInstance(document.getElementById('incomeModal'));
    modal.hide();
 }
@@ -182,7 +171,6 @@ function renderCreditList() {
                        <span class="method-badge credito-badge">
                            ${credit.cardName} (Crédito)
                        </span>
-                       <button class="btn btn-sm btn-danger" data-index="${index}" data-type="credit">×</button>
                    </div>
                </div>
                
@@ -224,7 +212,6 @@ function renderOneTimeList() {
                             `${purchase.cardName} (Débito)` : 'Efectivo'}
                        </span>
                    </div>
-                   <button class="btn btn-sm btn-danger" data-index="${index}" data-type="oneTime">×</button>
                </div>
                <span class="fw-bold">$${purchase.total.toFixed(2)}</span>
            </div>

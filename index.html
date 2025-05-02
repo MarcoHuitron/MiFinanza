@@ -10,6 +10,30 @@
 </head>
 
 <body class="bg-light">
+
+   <nav class="navbar navbar-expand-lg bg-body-primary navbar-light shadow-sm">
+      <div class="container-fluid">
+         <a class="navbar-brand" href="/">MINANCE</a>
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+               <li class="nav-item">
+                  <a class="nav-link" href="/historial.html">Historial</a>
+               </li>
+               <!-- <li class="nav-item">
+                  <a class="nav-link" href="#">Configuración</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" href="#">Perfil</a>
+               </li> -->
+            </ul>
+         </div>
+      </div>
+   </nav>
+
    <div class="container py-4">
       <div class="card mb-4 shadow-sm">
          <div class="card-header bg-primary text-white">
@@ -38,7 +62,6 @@
          </div>
       </div>
 
-      <!-- Modal para editar ingresos -->
       <div class="modal fade" id="incomeModal" tabindex="-1">
          <div class="modal-dialog">
             <div class="modal-content">
@@ -58,7 +81,6 @@
       </div>
 
       <div class="row g-4">
-         <!-- Tarjeta de Crédito -->
          <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                <div class="card-header bg-secondary text-white">
@@ -90,7 +112,6 @@
             </div>
          </div>
 
-         <!-- Compra Única -->
          <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                <div class="card-header bg-secondary text-white">
@@ -122,26 +143,16 @@
       </div>
 
 
-      <!-- Listados -->
       <div class="row g-4">
          <div class="col-md-6" id="creditList"></div>
          <div class="col-md-6" id="oneTimeList"></div>
       </div>
    </div>
 
-   <div class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
-            <h4>Historial Mensual</h4>
-        </div>
-        <div class="card-body" id="historyContainer">
-         
-        </div>
-    </div>
-</div>
+   
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-   <script src="scripts.js"></script>
+   <script src="/scripts/scripts.js"></script>
 </body>
 
 </html>
