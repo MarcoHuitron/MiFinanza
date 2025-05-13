@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio - Control de Gastos</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+    p {
+      margin-bottom: 30px;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    .btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 24px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn:hover {
+      background: #fff;
+      color: #1e3c72;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenido</h1>
+    <p>Controla tus gastos de manera sencilla. Regístrate o inicia sesión para continuar.</p>
+    <a href="/register.html" class="btn">Registrarse</a>
+    <a href="/login.html" class="btn">Iniciar Sesión</a>
+  </div>
+</body>
+</html>

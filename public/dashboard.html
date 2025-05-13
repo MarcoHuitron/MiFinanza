@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #1e90ff;
+      color: #fff;
+    }
+
+    section {
+      margin-top: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f0f0f0;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close {
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .form-group {
+      margin: 12px 0;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Bienvenido <span id="nombreUsuario"></span></h1>
+    <button id="openCardModal">+ Añadir Tarjeta</button>
+    <button id="logoutButton" style="background: #ff4d4d;">Cerrar Sesión</button>
+
+  </header>
+  <section>
+    <h2>Tus tarjetas</h2>
+    <ul id="listaTarjetas"></ul>
+  </section>
+  <section>
+    <h2>Tus compras</h2>
+    <ul id="listaCompras"></ul>
+  </section>
+
+  <!-- Modal para agregar tarjeta -->
+  <div class="modal" id="cardModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Tarjeta</h2>
+        <span class="close" id="closeCardModal">&times;</span>
+      </div>
+      <form id="cardForm">
+        <div class="form-group">
+          <label for="cardName">Nombre de la tarjeta</label>
+          <input type="text" id="cardName" name="cardName" required />
+        </div>
+        <div class="form-group">
+          <label for="cardType">Tipo de tarjeta</label>
+          <select id="cardType" name="cardType" required>
+            <option value="credito">Crédito</option>
+            <option value="debito">Débito</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cardLast4">Últimos 4 dígitos</label>
+          <input type="number" id="cardLast4" name="cardLast4" maxlength="4" pattern="\\d{4}" required />
+        </div>
+        <button type="submit">Guardar Tarjeta</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="dashboard.js" defer></script>
+</body>
+
+</html>
