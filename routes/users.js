@@ -51,4 +51,33 @@ router.post('/login', (req, res) => {
   });
 });
 
+// GET /api/users/:id/ingresos
+router.get('/:id/ingresos', (req, res) => {
+  const { id } = req.params;
+  const sql = 'SELECT ingresos FROM usuarios WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('Error al obtener los ingresos:', err);
+      return res.status(500).json({ error: 'Error al obtener los ingresos' });
+    }
+    const ingresos = results[0]?.ingresos ?? 0;
+    res.json({ ingresos });
+  });
+});
+
+// PUT /api/users/:id/ingresos
+router.put('/:id/ingresos', (req, res) => {
+  const { id } = req.params;
+  const { ingresos } = req.body;
+  const sql = 'UPDATE usuarios SET ingresos = ? WHERE id = ?';
+  db.query(sql, [ingresos, id], (err, result) => {
+    if (err) {
+      console.error('Error al actualizar los ingresos:', err);
+      return res.status(500).json({ error: 'Error al actualizar los ingresos' });
+    }
+    res.json({ success: true });
+  });
+});
+
+
 module.exports = router;

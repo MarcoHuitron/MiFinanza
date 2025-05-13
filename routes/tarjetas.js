@@ -34,4 +34,15 @@ router.post('/', (req, res) => {
   });
 });
 
+// Eliminar tarjeta
+// DELETE /api/tarjetas/:id
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  const sql = 'DELETE FROM tarjetas WHERE id = ?';
+  db.query(sql, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Error al eliminar la tarjeta' });
+    res.json({ success: true });
+  });
+});
+
 module.exports = router;

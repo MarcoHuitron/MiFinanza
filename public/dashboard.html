@@ -109,18 +109,38 @@
 <body>
   <header>
     <h1>Bienvenido <span id="nombreUsuario"></span></h1>
-    <button id="openCardModal">+ Añadir Tarjeta</button>
     <button id="logoutButton" style="background: #ff4d4d;">Cerrar Sesión</button>
 
   </header>
+
+  <section>
+    <h2>Control de Gastos</h2>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="setIncomeButton" style="background: #4caf50;">Establecer Ingresos</button>
+      <div style="flex: 1; background: #f0f0f0; border-radius: 4px; overflow: hidden; height: 20px;">
+        <div id="progressBar" style="width: 0%; background: #1e90ff; height: 100%;"></div>
+      </div>
+      <span id="progressText">0%</span>
+    </div>
+    <div id="incomeDetails" style="margin-top: 10px; font-size: 0.9rem; color: #333;">
+      <p>Ingresos Mensuales: <span id="monthlyIncomeText">$0</span></p>
+      <p>Restante Mensual: <span id="remainingIncomeText">$0</span></p>
+    </div>
+  </section>
+
   <section>
     <h2>Tus tarjetas</h2>
     <ul id="listaTarjetas"></ul>
+    <button id="openCardModal">+ Añadir Tarjeta</button>
   </section>
+
   <section>
     <h2>Tus compras</h2>
     <ul id="listaCompras"></ul>
+    <button id="openCompraModal" style="margin-top: 10px;">+ Añadir Compra</button>
   </section>
+
+
 
   <!-- Modal para agregar tarjeta -->
   <div class="modal" id="cardModal">
@@ -150,7 +170,75 @@
     </div>
   </div>
 
+  <!-- Modal para agregar compra -->
+  <div class="modal" id="compraModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Agregar Compra</h2>
+        <span class="close" id="closeCompraModal">&times;</span>
+      </div>
+      <form id="compraForm">
+        <div class="form-group">
+          <label for="compraTarjeta">Tarjeta</label>
+          <select id="compraTarjeta" name="compraTarjeta" required></select>
+        </div>
+        <div class="form-group">
+          <label for="compraDescripcion">Descripción</label>
+          <input type="text" id="compraDescripcion" name="compraDescripcion" required />
+        </div>
+        <div class="form-group">
+          <label for="compraMonto">Monto</label>
+          <input type="number" id="compraMonto" name="compraMonto" required />
+        </div>
+        <div id="creditoFields" style="display: none;">
+          <div class="form-group">
+            <label for="compraMeses">¿A meses?</label>
+            <select id="compraMeses" name="compraMeses">
+              <option value="1">No</option>
+              <option value="3">3 meses</option>
+              <option value="6">6 meses</option>
+              <option value="12">12 meses</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">Guardar Compra</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para establecer ingresos -->
+  <div class="modal" id="incomeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Establecer Ingresos Mensuales</h2>
+        <span class="close" id="closeIncomeModal">&times;</span>
+      </div>
+      <form id="incomeForm">
+        <div class="form-group">
+          <label for="monthlyIncome">Ingresos Mensuales</label>
+          <input type="number" id="monthlyIncome" name="monthlyIncome" required />
+        </div>
+        <button type="submit">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Confirmar Eliminación</h2>
+        <span class="close" id="closeConfirmModal">&times;</span>
+      </div>
+      <p id="confirmMessage">¿Estás seguro de que deseas eliminar este elemento?</p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button id="cancelButton" style="background: #ccc; color: black;">Cancelar</button>
+        <button id="confirmButton" style="background: #ff4d4d; color: white;">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="dashboard.js" defer></script>
 </body>
 
-</html>
+</html> 
