@@ -11,27 +11,23 @@ router.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(contraseña, 10);
     const query = 'INSERT INTO usuarios (nombre, email, contraseña) VALUES (?, ?, ?)';
-    db.query(query, [nombre, email, hashedPassword], (err, results) => {
-      if (err) return res.status(500).json({ error: 'Error al registrar' });
-      res.status(201).json({ mensaje: 'Usuario registrado correctamente' });
-    });
+    await db.query(query, [nombre, email, hashedPassword]);
+    res.status(201).json({ mensaje: 'Usuario registrado correctamente' });
   } catch (err) {
-    res.status(500).json({ error: 'Error al encriptar contraseña' });
+    res.status(500).json({ error: 'Error al registrar' });
   }
 });
 
 // Login de usuario
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, contraseña } = req.body;
   const query = 'SELECT * FROM usuarios WHERE email = ?';
 
-  db.query(query, [email], async (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error en la consulta' });
-
+  try {
+    const [results] = await db.query(query, [email]);
     if (results.length === 0) {
       return res.status(401).json({ error: 'Usuario no encontrado' });
     }
-
     const usuario = results[0];
     const contraseñaCorrecta = await bcrypt.compare(contraseña, usuario.contraseña);
 
@@ -39,7 +35,6 @@ router.post('/login', (req, res) => {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Puedes retornar solo los datos necesarios
     res.json({
       mensaje: 'Login exitoso',
       usuario: {
@@ -48,36 +43,37 @@ router.post('/login', (req, res) => {
         email: usuario.email,
       }
     });
-  });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en la consulta' });
+  }
 });
 
 // GET /api/users/:id/ingresos
-router.get('/:id/ingresos', (req, res) => {
+router.get('/:id/ingresos', async (req, res) => {
   const { id } = req.params;
   const sql = 'SELECT ingresos FROM usuarios WHERE id = ?';
-  db.query(sql, [id], (err, results) => {
-    if (err) {
-      console.error('Error al obtener los ingresos:', err);
-      return res.status(500).json({ error: 'Error al obtener los ingresos' });
-    }
+  try {
+    const [results] = await db.query(sql, [id]);
     const ingresos = results[0]?.ingresos ?? 0;
     res.json({ ingresos });
-  });
+  } catch (err) {
+    console.error('Error al obtener los ingresos:', err);
+    res.status(500).json({ error: 'Error al obtener los ingresos' });
+  }
 });
 
 // PUT /api/users/:id/ingresos
-router.put('/:id/ingresos', (req, res) => {
+router.put('/:id/ingresos', async (req, res) => {
   const { id } = req.params;
   const { ingresos } = req.body;
   const sql = 'UPDATE usuarios SET ingresos = ? WHERE id = ?';
-  db.query(sql, [ingresos, id], (err, result) => {
-    if (err) {
-      console.error('Error al actualizar los ingresos:', err);
-      return res.status(500).json({ error: 'Error al actualizar los ingresos' });
-    }
+  try {
+    await db.query(sql, [ingresos, id]);
     res.json({ success: true });
-  });
+  } catch (err) {
+    console.error('Error al actualizar los ingresos:', err);
+    res.status(500).json({ error: 'Error al actualizar los ingresos' });
+  }
 });
-
 
 module.exports = router;

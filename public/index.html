@@ -3,60 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inicio - Control de Gastos</title>
+  <title>Inicio - MiFinanza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
     }
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 40px;
+    .hero {
+      padding: 80px 0 40px 0;
       text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+      animation: fadeInDown 1s;
     }
-    h1 {
-      margin-bottom: 20px;
-      font-size: 2rem;
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+      animation: popIn 1.2s;
     }
-    p {
+    .hero-desc {
+      font-size: 1.2rem;
+      opacity: 0.9;
       margin-bottom: 30px;
-      font-size: 1rem;
-      opacity: 0.8;
+      animation: fadeIn 2s;
     }
-    .btn {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      border: 2px solid #fff;
-      border-radius: 8px;
-      text-decoration: none;
+    .btn-animated {
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(30,60,114,0.15);
+    }
+    .btn-animated:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 32px rgba(30,60,114,0.25);
+    }
+    .features {
+      margin: 40px auto 0 auto;
+      max-width: 900px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      animation: fadeInUp 1.2s;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 32px 24px;
+      min-width: 260px;
+      max-width: 320px;
       color: #fff;
-      font-weight: bold;
-      transition: background 0.3s, color 0.3s;
+      box-shadow: 0 2px 16px rgba(30,60,114,0.10);
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(2px);
     }
-    .btn:hover {
-      background: #fff;
-      color: #1e3c72;
+    .feature-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(30,60,114,0.18);
+      background: rgba(255,255,255,0.18);
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: popIn 1.5s;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    @keyframes fadeIn {
+      from { opacity: 0;}
+      to { opacity: 1;}
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.7);}
+      80% { opacity: 1; transform: scale(1.1);}
+      100% { opacity: 1; transform: scale(1);}
+    }
+    .footer {
+      text-align: center;
+      color: #e0e7ef;
+      opacity: 0.7;
+      font-size: 0.95rem;
+      margin-top: 60px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
     }
   </style>
+  <!-- Iconos de Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Bienvenido</h1>
-    <p>Controla tus gastos de manera sencilla. Regístrate o inicia sesión para continuar.</p>
-    <a href="/register.html" class="btn">Registrarse</a>
-    <a href="/login.html" class="btn">Iniciar Sesión</a>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">MiFinanza</a>
+      <div>
+        <a href="login.html" class="btn btn-outline-light btn-sm me-2">Iniciar Sesión</a>
+        <a href="register.html" class="btn btn-light btn-sm">Registrarse</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-title">¡Bienvenido a tu Control de Gastos!</div>
+      <div class="hero-desc">
+        Lleva el control de tus finanzas personales de forma <b>fácil</b>, <b>rápida</b> y <b>segura</b>.<br>
+        Registra tus tarjetas, compras y consulta tu historial mensual con un solo clic.
+      </div>
+      <a href="register.html" class="btn btn-warning btn-lg btn-animated me-2">
+        <i class="bi bi-person-plus"></i> Crear Cuenta
+      </a>
+      <a href="login.html" class="btn btn-outline-light btn-lg btn-animated">
+        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon text-warning"><i class="bi bi-credit-card"></i></div>
+      <h5 class="fw-bold mb-2">Gestión de Tarjetas</h5>
+      <div>Agrega y administra tus tarjetas de crédito y débito de manera sencilla y segura.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon text-success"><i class="bi bi-bar-chart-line"></i></div>
+      <h5 class="fw-bold mb-2">Control de Gastos</h5>
+      <div>Visualiza tus gastos mensuales, pagos a meses y tu saldo restante en tiempo real.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon text-info"><i class="bi bi-clock-history"></i></div>
+      <h5 class="fw-bold mb-2">Historial Detallado</h5>
+      <div>Consulta el historial de tus compras y pagos mes a mes, ¡nunca pierdas de vista tu dinero!</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon text-danger"><i class="bi bi-shield-lock"></i></div>
+      <h5 class="fw-bold mb-2">Privacidad y Seguridad</h5>
+      <div>Tus datos están protegidos con cifrado y autenticación segura.</div>
+    </div>
+  </section>
+
+  <div class="footer">
+    &copy; 2025 MiFinanza. Todos los derechos reservados.
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

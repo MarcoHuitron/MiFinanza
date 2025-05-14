@@ -16,7 +16,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/users', userRoutes);
 app.use('/api/tarjetas', require('./routes/tarjetas'));
 app.use('/api/compras', require('./routes/compras'));
-
+const historialRoutes = require('./routes/historial');
+app.use('/api/historial', historialRoutes);
+const soporteRoutes = require('./routes/soporte');
+app.use('/api/soporte', soporteRoutes);
 
 // 4) Levantar servidor
 const PORT = process.env.PORT || 3000;

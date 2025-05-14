@@ -4,241 +4,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard - MiFinanza</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
+      background: #f8fafc;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .progress {
+      height: 24px;
     }
 
-    h1 {
-      font-size: 1.5rem;
+    .modal-header .btn-close {
+      margin: -0.5rem -0.5rem -0.5rem auto;
     }
 
-    button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      background: #1e90ff;
-      color: #fff;
-    }
-
-    section {
-      margin-top: 20px;
-    }
-
-    h2 {
-      margin-bottom: 10px;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background: #f0f0f0;
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 4px;
-    }
-
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
+    .card-list li {
       background: #fff;
-      padding: 20px;
+      margin-bottom: 10px;
       border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    .modal-header {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      padding: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .modal-header h2 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .close {
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-
-    .form-group {
-      margin: 12px 0;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    .card-list li .badge {
+      font-size: 0.9em;
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Bienvenido <span id="nombreUsuario"></span></h1>
-    <button id="logoutButton" style="background: #ff4d4d;">Cerrar Sesión</button>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+      <span class="navbar-brand">Bienvenido <span id="nombreUsuario"></span></span>
+      <a class="navbar-brand" href="historial.html">Historial</a>
+      <button id="helpButton" class="btn btn-outline-light ms-2">Ayuda</button>
+      <button id="logoutButton" class="btn btn-danger">Cerrar Sesión</button>
+    </div>
+  </nav>
 
-  </header>
-
-  <section>
-    <h2>Control de Gastos</h2>
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button id="setIncomeButton" style="background: #4caf50;">Establecer Ingresos</button>
-      <div style="flex: 1; background: #f0f0f0; border-radius: 4px; overflow: hidden; height: 20px;">
-        <div id="progressBar" style="width: 0%; background: #1e90ff; height: 100%;"></div>
+  <div class="container">
+    <!-- Control de Gastos -->
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Control de Gastos</h2>
+          <div class="d-flex justify-content-end my-3">
+            <button id="cierreMesBtn" class="btn btn-warning">Cierre de mes</button>
+          </div>
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <button id="setIncomeButton" class="btn btn-success">Establecer Ingresos</button>
+            <div class="flex-grow-1">
+              <div class="progress">
+                <div id="progressBar" class="progress-bar" style="width: 0%">0%</div>
+              </div>
+            </div>
+          </div>
+          <div class="row text-center mt-3">
+            <div class="col">
+              <div class="fw-bold">Ingresos Mensuales</div>
+              <span id="monthlyIncomeText" class="text-success">$0</span>
+            </div>
+            <div class="col">
+              <div class="fw-bold">Restante Mensual</div>
+              <span id="remainingIncomeText" class="text-primary">$0</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <span id="progressText">0%</span>
-    </div>
-    <div id="incomeDetails" style="margin-top: 10px; font-size: 0.9rem; color: #333;">
-      <p>Ingresos Mensuales: <span id="monthlyIncomeText">$0</span></p>
-      <p>Restante Mensual: <span id="remainingIncomeText">$0</span></p>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <h2>Tus tarjetas</h2>
-    <ul id="listaTarjetas"></ul>
-    <button id="openCardModal">+ Añadir Tarjeta</button>
-  </section>
+    <!-- Tarjetas -->
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">Tus tarjetas</h2>
+            <button id="openCardModal" class="btn btn-outline-primary btn-sm">+ Añadir Tarjeta</button>
+          </div>
+          <ul id="listaTarjetas" class="list-unstyled card-list"></ul>
+        </div>
+      </div>
+    </section>
 
-  <section>
-    <h2>Tus compras</h2>
-    <ul id="listaCompras"></ul>
-    <button id="openCompraModal" style="margin-top: 10px;">+ Añadir Compra</button>
-  </section>
-
-
+    <!-- Compras -->
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">Tus compras</h2>
+            <button id="openCompraModal" class="btn btn-outline-primary btn-sm">+ Añadir Compra</button>
+          </div>
+          <ul id="listaCompras" class="list-unstyled card-list"></ul>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <!-- Modal para agregar tarjeta -->
-  <div class="modal" id="cardModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Tarjeta</h2>
-        <span class="close" id="closeCardModal">&times;</span>
+  <div class="modal fade" id="cardModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="cardForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar Tarjeta</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="cardName" class="form-label">Nombre de la tarjeta</label>
+              <input type="text" id="cardName" name="cardName" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="cardType" class="form-label">Tipo de tarjeta</label>
+              <select id="cardType" name="cardType" class="form-select" required>
+                <option value="credito">Crédito</option>
+                <option value="debito">Débito</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="cardLast4" class="form-label">Últimos 4 dígitos</label>
+              <input type="number" id="cardLast4" name="cardLast4" maxlength="4" pattern="\d{4}" class="form-control"
+                required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Guardar Tarjeta</button>
+          </div>
+        </form>
       </div>
-      <form id="cardForm">
-        <div class="form-group">
-          <label for="cardName">Nombre de la tarjeta</label>
-          <input type="text" id="cardName" name="cardName" required />
-        </div>
-        <div class="form-group">
-          <label for="cardType">Tipo de tarjeta</label>
-          <select id="cardType" name="cardType" required>
-            <option value="credito">Crédito</option>
-            <option value="debito">Débito</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="cardLast4">Últimos 4 dígitos</label>
-          <input type="number" id="cardLast4" name="cardLast4" maxlength="4" pattern="\\d{4}" required />
-        </div>
-        <button type="submit">Guardar Tarjeta</button>
-      </form>
     </div>
   </div>
 
   <!-- Modal para agregar compra -->
-  <div class="modal" id="compraModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Agregar Compra</h2>
-        <span class="close" id="closeCompraModal">&times;</span>
-      </div>
-      <form id="compraForm">
-        <div class="form-group">
-          <label for="compraTarjeta">Tarjeta</label>
-          <select id="compraTarjeta" name="compraTarjeta" required></select>
-        </div>
-        <div class="form-group">
-          <label for="compraDescripcion">Descripción</label>
-          <input type="text" id="compraDescripcion" name="compraDescripcion" required />
-        </div>
-        <div class="form-group">
-          <label for="compraMonto">Monto</label>
-          <input type="number" id="compraMonto" name="compraMonto" required />
-        </div>
-        <div id="creditoFields" style="display: none;">
-          <div class="form-group">
-            <label for="compraMeses">¿A meses?</label>
-            <select id="compraMeses" name="compraMeses">
-              <option value="1">No</option>
-              <option value="3">3 meses</option>
-              <option value="6">6 meses</option>
-              <option value="12">12 meses</option>
-            </select>
+  <div class="modal fade" id="compraModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="compraForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar Compra</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
-        </div>
-        <button type="submit">Guardar Compra</button>
-      </form>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="compraTarjeta" class="form-label">Tarjeta</label>
+              <select id="compraTarjeta" name="compraTarjeta" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label for="compraDescripcion" class="form-label">Descripción</label>
+              <input type="text" id="compraDescripcion" name="compraDescripcion" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="compraMonto" class="form-label">Monto</label>
+              <input type="number" id="compraMonto" name="compraMonto" class="form-control" required />
+            </div>
+            <div id="creditoFields" style="display: none;">
+              <div class="mb-3">
+                <label for="compraMeses" class="form-label">¿A meses?</label>
+                <select id="compraMeses" name="compraMeses" class="form-select">
+                  <option value="1">No</option>
+                  <option value="3">3 meses</option>
+                  <option value="6">6 meses</option>
+                  <option value="12">12 meses</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Guardar Compra</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- Modal para establecer ingresos -->
-  <div class="modal" id="incomeModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Establecer Ingresos Mensuales</h2>
-        <span class="close" id="closeIncomeModal">&times;</span>
+  <div class="modal fade" id="incomeModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="incomeForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Establecer Ingresos Mensuales</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="monthlyIncome" class="form-label">Ingresos Mensuales</label>
+              <input type="number" id="monthlyIncome" name="monthlyIncome" class="form-control" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Guardar</button>
+          </div>
+        </form>
       </div>
-      <form id="incomeForm">
-        <div class="form-group">
-          <label for="monthlyIncome">Ingresos Mensuales</label>
-          <input type="number" id="monthlyIncome" name="monthlyIncome" required />
-        </div>
-        <button type="submit">Guardar</button>
-      </form>
     </div>
   </div>
 
   <!-- Modal de confirmación -->
-  <div class="modal" id="confirmModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Confirmar Eliminación</h2>
-        <span class="close" id="closeConfirmModal">&times;</span>
-      </div>
-      <p id="confirmMessage">¿Estás seguro de que deseas eliminar este elemento?</p>
-      <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button id="cancelButton" style="background: #ccc; color: black;">Cancelar</button>
-        <button id="confirmButton" style="background: #ff4d4d; color: white;">Eliminar</button>
+  <div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage">¿Estás seguro de que deseas eliminar este elemento?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button id="confirmButton" type="button" class="btn btn-danger">Eliminar</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Modal de Ayuda/Feedback -->
+  <div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="helpForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Soporte / Feedback</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="helpMessage" class="form-label">¿En qué podemos ayudarte?</label>
+              <textarea id="helpMessage" class="form-control" rows="4" required
+                placeholder="Escribe tu mensaje aquí..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="dashboard.js" defer></script>
 </body>
 
-</html> 
+</html>
+```
