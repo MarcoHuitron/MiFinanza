@@ -33,13 +33,39 @@
     .card-list li .badge {
       font-size: 0.9em;
     }
+
+    @media (max-width: 600px) {
+      .card-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 10px;
+        font-size: 0.98rem;
+        gap: 6px;
+      }
+      .card-list li .badge {
+        margin-top: 4px;
+        font-size: 0.92em;
+      }
+      .card .card-body > .d-flex:not(.align-items-center) {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+      }
+      .card .card-body h2 {
+        font-size: 1.1rem;
+      }
+      #openCompraModal, #openCardModal {
+        width: 100%;
+        margin-top: 8px;
+      }
+    }
   </style>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
     <div class="container">
-      <span class="navbar-brand">Bienvenido <span id="nombreUsuario"></span></span>
+      <span class="navbar-brand">Bienvenid@ <span id="nombreUsuario"></span></span>
       <a class="navbar-brand" href="historial.html">Historial</a>
       <button id="helpButton" class="btn btn-outline-light ms-2">Ayuda</button>
       <button id="logoutButton" class="btn btn-danger">Cerrar Sesión</button>
@@ -59,7 +85,7 @@
             <button id="setIncomeButton" class="btn btn-success">Establecer Ingresos</button>
             <div class="flex-grow-1">
               <div class="progress">
-                <div id="progressBar" class="progress-bar" style="width: 0%">0%</div>
+                <div id="progressBar" class="progress-bar" style="width: 0%; text-decoration-color: black;">0%</div>
               </div>
             </div>
           </div>
@@ -252,4 +278,4 @@
 </body>
 
 </html>
-```
+`````

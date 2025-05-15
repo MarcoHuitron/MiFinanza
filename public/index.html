@@ -97,6 +97,51 @@
       margin-bottom: 16px;
       letter-spacing: 0.5px;
     }
+    @media (max-width: 768px) {
+      .hero {
+        padding: 48px 0 24px 0;
+      }
+      .hero-title {
+        font-size: 2rem;
+      }
+      .hero-desc {
+        font-size: 1rem;
+      }
+      .features {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 12px;
+      }
+      .feature-card {
+        max-width: 100%;
+        min-width: unset;
+        padding: 20px 12px;
+        font-size: 0.98rem;
+      }
+      .footer {
+        font-size: 0.85rem;
+        margin-top: 32px;
+      }
+      .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .navbar .btn {
+        margin-bottom: 6px;
+      }
+    }
+    @media (max-width: 400px) {
+      .hero-title {
+        font-size: 1.3rem;
+      }
+      .feature-icon {
+        font-size: 2rem;
+      }
+      .btn {
+        margin-bottom: 10px;
+      }
+    }
   </style>
   <!-- Iconos de Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -121,7 +166,7 @@
         Lleva el control de tus finanzas personales de forma <b>fácil</b>, <b>rápida</b> y <b>segura</b>.<br>
         Registra tus tarjetas, compras y consulta tu historial mensual con un solo clic.
       </div>
-      <a href="register.html" class="btn btn-warning btn-lg btn-animated me-2">
+      <a href="register.html" class="btn btn-warning btn-lg btn-animated">
         <i class="bi bi-person-plus"></i> Crear Cuenta
       </a>
       <a href="login.html" class="btn btn-outline-light btn-lg btn-animated">
