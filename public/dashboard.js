@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         body: JSON.stringify({ ingresos })
       });
       incomeModalInstance.hide();
-      updateProgressBar();
+      window.location.reload();
     } catch (err) {
       console.error('Error al guardar ingresos', err);
     }
