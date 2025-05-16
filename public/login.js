@@ -1,8 +1,30 @@
+// Redirigir si ya hay sesión iniciada
+if (localStorage.getItem('usuario')) {
+  window.location.href = '/dashboard.html';
+}
+
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').value.trim();
   const contraseña = document.getElementById('password').value;
+
+  const mensaje = document.getElementById('mensaje');
+
+  // Validar email
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    mensaje.textContent = 'Por favor, ingresa un correo electrónico válido.';
+    mensaje.style.color = 'red';
+    return;
+  }
+
+  // Validar longitud de contraseña
+  if (contraseña.length < 6) {
+    mensaje.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+    mensaje.style.color = 'red';
+    return;
+  }
 
   try {
     const response = await fetch('/api/users/login', {
@@ -13,21 +35,18 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
     const data = await response.json();
 
-    const mensaje = document.getElementById('mensaje');
     if (response.ok) {
       mensaje.textContent = `Bienvenido, ${data.usuario.nombre}!`;
       mensaje.style.color = 'green';
 
-      // Puedes guardar el usuario en localStorage, por ejemplo:
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-      // Redirigir al dashboard o página principal
       window.location.href = '/dashboard.html';
     } else {
       mensaje.textContent = data.error;
       mensaje.style.color = 'red';
     }
   } catch (error) {
-    document.getElementById('mensaje').textContent = 'Error al conectar con el servidor.';
+    mensaje.textContent = 'Error al conectar con el servidor.';
+    mensaje.style.color = 'red';
   }
 });

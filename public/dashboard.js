@@ -207,7 +207,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const percentage = Math.min((monthlyExpenses / monthlyIncome) * 100, 100);
     const remaining = Math.max(monthlyIncome - monthlyExpenses, 0);
     progressBar.style.width = `${percentage}%`;
-    progressBar.textContent = `${Math.round(percentage)}%`;
+    progressBar.textContent = `${percentage.toFixed(2)}%`;
+    document.getElementById('progressBar').style.width = percentage + '%';
+    document.getElementById('progressPercent').textContent = `${percentage.toFixed(2)}%`;
     monthlyIncomeText.textContent = `$${monthlyIncome.toFixed(2)}`;
     remainingIncomeText.textContent = `$${remaining.toFixed(2)}`;
   }

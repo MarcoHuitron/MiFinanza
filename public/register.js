@@ -1,25 +1,50 @@
+if (localStorage.getItem('usuario')) {
+  window.location.href = '/dashboard.html';
+}
 document.getElementById('registerForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  const nombre = document.getElementById('nombre').value;
-  const email = document.getElementById('email').value;
+  const nombre = document.getElementById('nombre').value.trim();
+  const email = document.getElementById('email').value.trim();
   const contraseña = document.getElementById('password').value;
+
+  const mensaje = document.getElementById('mensaje');
+
+  // Validar email
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    mensaje.textContent = 'Por favor, ingresa un correo electrónico válido.';
+    mensaje.style.color = 'red';
+    return;
+  }
+
+  // Sanitizar nombre (solo letras, espacios y acentos)
+  const nombreSanitizado = nombre.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+  if (nombreSanitizado.length < 2) {
+    mensaje.textContent = 'El nombre debe tener al menos 2 letras y solo puede contener letras y espacios.';
+    mensaje.style.color = 'red';
+    return;
+  }
+
+  // Validar longitud de contraseña
+  if (contraseña.length < 6) {
+    mensaje.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+    mensaje.style.color = 'red';
+    return;
+  }
 
   try {
     const response = await fetch('/api/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, contraseña })
+      body: JSON.stringify({ nombre: nombreSanitizado, email, contraseña })
     });
 
     const data = await response.json();
-    const mensaje = document.getElementById('mensaje');
 
     if (response.ok) {
       mensaje.textContent = 'Registro exitoso. Te redirigimos al login...';
       mensaje.style.color = 'green';
-
-      // Redirigir a login.html tras 2 segundos
       setTimeout(() => {
         window.location.href = '/login.html';
       }, 2000);
@@ -28,7 +53,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
       mensaje.style.color = 'red';
     }
   } catch (error) {
-    document.getElementById('mensaje').textContent = 'Error al conectar con el servidor.';
+    mensaje.textContent = 'Error al conectar con el servidor.';
     mensaje.style.color = 'red';
   }
 });
