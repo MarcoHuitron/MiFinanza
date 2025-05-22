@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           usuario_id: user.id,
+          email: user.email,
           mensaje
         })
       });
