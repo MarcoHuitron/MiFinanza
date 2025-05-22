@@ -1,3 +1,8 @@
+// Escoge la URL según el entorno
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/api'
+  : 'https://mifinanza.onrender.com'; // <-- Cambia por tu URL real de Render
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = JSON.parse(localStorage.getItem('usuario'));
   if (!user) {
@@ -45,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mensaje = helpMessage.value.trim();
     if (!mensaje) return;
     try {
-      await fetch('/api/soporte', {
+      await fetch(`${API_URL}/soporte`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -74,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Función para cargar tarjetas
   async function loadTarjetas() {
     try {
-      const res = await fetch(`/api/tarjetas/${user.id}`);
+      const res = await fetch(`${API_URL}/tarjetas/${user.id}`);
       const tarjetas = await res.json();
       if (tarjetas.length === 0) {
         listaTarjetas.innerHTML = '<li>No tienes tarjetas registradas.</li>';
@@ -92,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.delete-tarjeta').forEach(button => {
         button.addEventListener('click', () => {
           openConfirmModal('¿Estás seguro de que deseas eliminar esta tarjeta?', async () => {
-            await fetch(`/api/tarjetas/${button.dataset.id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/tarjetas/${button.dataset.id}`, { method: 'DELETE' });
             await loadTarjetas();
           });
         });
@@ -116,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Función para cargar compras
   async function loadCompras() {
-    const res = await fetch(`/api/compras/${user.id}`);
+    const res = await fetch(`${API_URL}/compras/${user.id}`);
     const compras = await res.json();
     if (compras.length === 0) {
       listaCompras.innerHTML = '<li>No has registrado compras.</li>';
@@ -149,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.delete-compra').forEach(btn => {
       btn.onclick = () => {
         openConfirmModal('¿Estás seguro de que deseas eliminar esta compra?', async () => {
-          await fetch(`/api/compras/${btn.dataset.id}`, { method: 'DELETE' });
+          await fetch(`${API_URL}/compras/${btn.dataset.id}`, { method: 'DELETE' });
           await loadCompras();
           await calculateMonthlyExpenses();
         });
@@ -159,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar tarjetas en el select con el atributo data-tipo
   async function loadTarjetasForCompra() {
-    const res = await fetch(`/api/tarjetas/${user.id}`);
+    const res = await fetch(`${API_URL}/tarjetas/${user.id}`);
     const tarjetas = await res.json();
     compraTarjeta.innerHTML = tarjetas
       .map(t => `<option value="${t._id}" data-tipo="${t.tipo}">${t.nombre} (${t.tipo})</option>`)
@@ -170,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Calcular gastos mensuales
   async function calculateMonthlyExpenses() {
     try {
-      const res = await fetch(`/api/compras/${user.id}`);
+      const res = await fetch(`${API_URL}/compras/${user.id}`);
       const compras = await res.json();
       monthlyExpenses = 0;
       compras.forEach(compra => {
@@ -187,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar ingresos mensuales
   async function loadMonthlyIncome() {
     try {
-      const res = await fetch(`/api/users/${user.id}/ingresos`);
+      const res = await fetch(`${API_URL}/users/${user.id}/ingresos`);
       const data = await res.json();
       monthlyIncome = parseFloat(data.ingresos) || 0;
       updateProgressBar();
@@ -228,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tipo = form.cardType.value;
     const numero = form.cardLast4.value;
     try {
-      await fetch('/api/tarjetas', {
+      await fetch(`${API_URL}/tarjetas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario_id: user.id, nombre, tipo, numero })
@@ -251,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const meses = compraForm.compraMeses ? compraForm.compraMeses.value : 1;
 
     try {
-      await fetch('/api/compras', {
+      await fetch(`${API_URL}/compras`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario_id: user.id, tarjeta_id: tarjetaId, descripcion, monto, meses })
@@ -271,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     const ingresos = parseFloat(document.getElementById('monthlyIncome').value);
     try {
-      await fetch(`/api/users/${user.id}/ingresos`, {
+      await fetch(`${API_URL}/users/${user.id}/ingresos`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingresos })
@@ -287,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('cierreMesBtn').addEventListener('click', async () => {
     if (confirm('¿Estás seguro de que deseas cerrar el mes? Las compras de este mes pasarán al historial.')) {
       try {
-        await fetch(`/api/compras/reiniciar-mes/${user.id}`, { method: 'POST' });
+        await fetch(`${API_URL}/compras/reiniciar-mes/${user.id}`, { method: 'POST' });
         await loadCompras();
         await calculateMonthlyExpenses();
         alert('¡Cierre de mes realizado! Puedes consultar el historial en la sección correspondiente.');

@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
-require('./db/database'); // <-- Importa la conexión a MongoDB
+require('./db/database'); 
 
 const app = express();
 const userRoutes = require('./routes/users');

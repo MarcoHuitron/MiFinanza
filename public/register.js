@@ -1,6 +1,12 @@
 if (localStorage.getItem('usuario')) {
   window.location.href = '/dashboard.html';
 }
+
+// URL base de la API según entorno
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/api'
+  : 'https://mifinanza.onrender.com/api';
+
 document.getElementById('registerForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -34,7 +40,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   }
 
   try {
-    const response = await fetch('/api/users/register', {
+    const response = await fetch(`${API_URL}/users/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre: nombreSanitizado, email, contraseña })

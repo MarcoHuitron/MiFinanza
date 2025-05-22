@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // URL base de la API según entorno
+  const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api'
+    : 'https://mifinanza.onrender.com'; // <-- Cambia por tu URL real de Render
+
   // Recupera el usuario logueado
   const user = JSON.parse(localStorage.getItem('usuario'));
   if (!user) {
@@ -13,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar historial desde el backend
   async function loadHistorial() {
     try {
-      const res = await fetch(`/api/historial/${user.id}`);
+      const res = await fetch(`${API_URL}/historial/${user.id}`);
       historial = await res.json();
       renderMeses();
       renderHistorial();
