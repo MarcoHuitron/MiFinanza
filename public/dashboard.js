@@ -47,19 +47,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   helpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const mensaje = helpMessage.value.trim();
+    const mensaje = document.getElementById('helpMessage').value.trim();
     if (!mensaje) return;
+
     try {
       await fetch(`${API_URL}/soporte`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           usuario_id: user.id,
-          email: user.email,
+          email: user.email, // <-- Aquí se envía el email del usuario logueado
           mensaje
         })
       });
-      helpModal.hide();
+      // Cierra el modal y muestra mensaje de éxito
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('helpModal')).hide();
       alert('¡Gracias por tu mensaje! Pronto nos pondremos en contacto.');
     } catch (err) {
       alert('Error al enviar el mensaje de soporte.');
