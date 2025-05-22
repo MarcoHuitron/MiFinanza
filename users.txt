@@ -1,3 +1,0 @@
-nombre: 'Emily Enriquez',
-  email: 'milkdos12@gmail.com',
-  'contraseña': 'sam445em'
