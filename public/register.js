@@ -5,7 +5,7 @@ if (localStorage.getItem('usuario')) {
 // URL base de la API según entorno
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000/api'
-  : 'https://mifinanza.onrender.com/';
+  : 'https://mifinanza.onrender.com';
 
 document.getElementById('registerForm').addEventListener('submit', async function (e) {
   e.preventDefault();
