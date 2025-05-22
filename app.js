@@ -3,7 +3,7 @@ const path = require('path');
 require('dotenv').config();
 require('./db/database'); 
 
-const cors = require('cors'); // <--- Agrega esto
+const cors = require('cors');
 
 const app = express();
 
