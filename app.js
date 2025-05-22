@@ -3,7 +3,15 @@ const path = require('path');
 require('dotenv').config();
 require('./db/database'); 
 
+const cors = require('cors'); // <--- Agrega esto
+
 const app = express();
+
+app.use(cors({
+  origin: ['https://myfinanza.netlify.app', 'http://localhost:3000'], // <-- Agrega aquí tu dominio de Netlify y local
+  credentials: true
+}));
+
 const userRoutes = require('./routes/users');
 
 app.use(express.json());
