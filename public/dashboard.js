@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch(`/api/tarjetas/${user.id}`);
     const tarjetas = await res.json();
     compraTarjeta.innerHTML = tarjetas
-      .map(t => `<option value="${t.id}" data-tipo="${t.tipo}">${t.nombre} (${t.tipo})</option>`)
+      .map(t => `<option value="${t._id}" data-tipo="${t.tipo}">${t.nombre} (${t.tipo})</option>`)
       .join('');
     compraTarjeta.dispatchEvent(new Event('change'));
   }

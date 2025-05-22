@@ -1,12 +1,14 @@
 require('dotenv').config();
 
-const mysql = require('mysql2/promise');
+const mongoose = require('mongoose');
 
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
-});
+const mongoURI = process.env.MONGO_URI || 'mongodb+srv://marcohuitron1327:AHOx9bXYMx96ehmB@cluster0.0qfdwzk.mongodb.net/finance?retryWrites=true&w=majority';
 
-module.exports = db;
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Conectado a MongoDB Atlas'))
+.catch(err => console.error('Error de conexión a MongoDB:', err));
+
+module.exports = mongoose;

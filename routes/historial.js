@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const HistorialCompra = require('../models/HistorialCompra');
 
 router.get('/:userId', async (req, res) => {
   const { userId } = req.params;
   try {
-    const [results] = await db.query(
-      'SELECT * FROM historial_compras WHERE usuario_id = ? ORDER BY anio_historial DESC, mes_historial DESC, fecha DESC',
-      [userId]
-    );
-    res.json(results);
+    const historial = await HistorialCompra.find({ usuario_id: userId })
+      .sort({ anio_historial: -1, mes_historial: -1, fecha: -1 });
+    res.json(historial);
   } catch (err) {
     res.status(500).json({ error: 'Error al obtener historial' });
   }

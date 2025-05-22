@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
+require('./db/database'); // <-- Importa la conexión a MongoDB
 
 const app = express();
 const userRoutes = require('./routes/users');
@@ -19,5 +20,5 @@ app.use('/api/soporte', soporteRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Conectado a MySQL y servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Conectado a MongoDB y servidor corriendo en http://localhost:${PORT}`);
 });

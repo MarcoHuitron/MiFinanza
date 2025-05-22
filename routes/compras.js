@@ -1,18 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/database');
+const Compra = require('../models/Compra');
+const Tarjeta = require('../models/Tarjeta');
+const HistorialCompra = require('../models/HistorialCompra');
 
 // GET /api/compras/:userId
 router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const sql = `
-    SELECT c.id, c.descripcion, c.monto, c.fecha, c.meses, c.meses_pagados, t.nombre AS tarjeta
-    FROM compras c
-    LEFT JOIN tarjetas t ON c.tarjeta_id = t.id
-    WHERE c.usuario_id = ?`;
   try {
-    const [results] = await db.query(sql, [userId]);
-    res.json(results);
+    const compras = await Compra.find({ usuario_id: req.params.userId }).populate('tarjeta_id');
+    // Formatea la respuesta para incluir el nombre de la tarjeta
+    const result = compras.map(c => ({
+      id: c._id,
+      descripcion: c.descripcion,
+      monto: c.monto,
+      fecha: c.fecha,
+      meses: c.meses,
+      meses_pagados: c.meses_pagados,
+      tarjeta: c.tarjeta_id?.nombre || ''
+    }));
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: 'Error al buscar compras' });
   }
@@ -21,23 +27,30 @@ router.get('/:userId', async (req, res) => {
 // POST /api/compras
 router.post('/', async (req, res) => {
   const { usuario_id, tarjeta_id, descripcion, monto, meses } = req.body;
-  const sql = `
-    INSERT INTO compras (usuario_id, tarjeta_id, descripcion, monto, meses, fecha)
-    VALUES (?, ?, ?, ?, ?, NOW())`;
+  console.log('Datos recibidos:', req.body); // <-- Agrega esto
+  if (!usuario_id || !tarjeta_id || !descripcion || !monto) {
+    return res.status(400).json({ error: 'Faltan datos requeridos' });
+  }
   try {
-    const [result] = await db.query(sql, [usuario_id, tarjeta_id, descripcion, monto, meses || 1]);
-    res.json({ success: true, id: result.insertId });
+    const compra = new Compra({
+      usuario_id,
+      tarjeta_id,
+      descripcion,
+      monto,
+      meses: meses || 1
+    });
+    await compra.save();
+    res.json({ success: true, id: compra._id });
   } catch (err) {
+    console.error('Error al guardar la compra:', err);
     res.status(500).json({ error: 'Error al guardar la compra' });
   }
 });
 
 // DELETE /api/compras/:id
 router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  const sql = 'DELETE FROM compras WHERE id = ?';
   try {
-    await db.query(sql, [id]);
+    await Compra.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Error al eliminar la compra' });
@@ -52,43 +65,44 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
   const anio = now.getFullYear();
 
   try {
-    // 1. Mueve compras de débito o meses=1 al historial (como antes)
-    const moveDebitoToHistorial = `
-      INSERT INTO historial_compras (usuario_id, descripcion, monto, fecha, tarjeta, meses, mes_historial, anio_historial)
-      SELECT c.usuario_id, c.descripcion, c.monto, c.fecha, t.nombre, c.meses, ?, ?
-      FROM compras c
-      LEFT JOIN tarjetas t ON c.tarjeta_id = t.id
-      WHERE c.usuario_id = ? AND c.meses = 1
-    `;
-    await db.query(moveDebitoToHistorial, [mes, anio, userId]);
-    await db.query('DELETE FROM compras WHERE usuario_id = ? AND meses = 1', [userId]);
+    // 1. Mueve compras de débito o meses=1 al historial
+    const comprasDebito = await Compra.find({ usuario_id: userId, meses: 1 });
+    for (const compra of comprasDebito) {
+      const tarjeta = await Tarjeta.findById(compra.tarjeta_id);
+      await HistorialCompra.create({
+        usuario_id: compra.usuario_id,
+        descripcion: compra.descripcion,
+        monto: compra.monto,
+        fecha: compra.fecha,
+        tarjeta: tarjeta?.nombre || '',
+        meses: compra.meses,
+        mes_historial: mes,
+        anio_historial: anio
+      });
+      await compra.deleteOne();
+    }
 
     // 2. Para compras a meses, registra el pago mensual en el historial y actualiza meses_pagados
-    const [comprasMeses] = await db.query('SELECT * FROM compras WHERE usuario_id = ? AND meses > 1', [userId]);
+    const comprasMeses = await Compra.find({ usuario_id: userId, meses: { $gt: 1 } });
     for (const compra of comprasMeses) {
-      // Registrar el pago de este mes en el historial
+      const tarjeta = await Tarjeta.findById(compra.tarjeta_id);
       const pagoMensual = compra.monto / compra.meses;
-      const movePagoMensualToHistorial = `
-        INSERT INTO historial_compras (usuario_id, descripcion, monto, fecha, tarjeta, meses, mes_historial, anio_historial)
-        VALUES (?, ?, ?, NOW(), 
-          (SELECT nombre FROM tarjetas WHERE id = ?), ?, ?, ?)
-      `;
-      await db.query(movePagoMensualToHistorial, [
-        compra.usuario_id,
-        compra.descripcion + ` (Pago mensual ${compra.meses_pagados + 1}/${compra.meses})`,
-        pagoMensual,
-        compra.tarjeta_id,
-        compra.meses,
-        mes,
-        anio
-      ]);
+      await HistorialCompra.create({
+        usuario_id: compra.usuario_id,
+        descripcion: `${compra.descripcion} (Pago mensual ${compra.meses_pagados + 1}/${compra.meses})`,
+        monto: pagoMensual,
+        fecha: new Date(),
+        tarjeta: tarjeta?.nombre || '',
+        meses: compra.meses,
+        mes_historial: mes,
+        anio_historial: anio
+      });
 
-      // Si ya se pagó el último mes, elimina la compra
       if (compra.meses_pagados + 1 >= compra.meses) {
-        await db.query('DELETE FROM compras WHERE id = ?', [compra.id]);
+        await compra.deleteOne();
       } else {
-        // Si no, incrementa meses_pagados
-        await db.query('UPDATE compras SET meses_pagados = meses_pagados + 1 WHERE id = ?', [compra.id]);
+        compra.meses_pagados += 1;
+        await compra.save();
       }
     }
 
