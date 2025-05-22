@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // URL base de la API según entorno
   const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api'
-    : 'https://mifinanza.onrender.com';
+    : 'https://mifinanza.onrender.com/api';
 
   // Recupera el usuario logueado
   const user = JSON.parse(localStorage.getItem('usuario'));

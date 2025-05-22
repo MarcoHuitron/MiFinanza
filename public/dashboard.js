@@ -1,7 +1,7 @@
 // Escoge la URL según el entorno
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000/api'
-  : 'https://mifinanza.onrender.com';
+  : 'https://mifinanza.onrender.com/api';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = JSON.parse(localStorage.getItem('usuario'));
