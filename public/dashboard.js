@@ -126,17 +126,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadCompras() {
     const res = await fetch(`${API_URL}/compras/${user.id}`);
     const compras = await res.json();
+    compras.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
     if (compras.length === 0) {
       listaCompras.innerHTML = '<li>No has registrado compras.</li>';
     } else {
       listaCompras.innerHTML = compras.map(c => {
         const meses = c.meses || 1;
         const mesesPagados = c.meses_pagados || 0;
+        const tarjeta = c.tarjeta_nombre ? `${c.tarjeta_nombre} (${c.tarjeta_tipo || ''})` : `Tarjeta: ${c.tarjeta_id || c.tarjeta}`;
         if (meses === 1) {
           return `
             <li>
               [${new Date(c.fecha).toLocaleDateString()}] ${c.descripcion} — 
               $${c.monto} <span class="badge bg-secondary">Pago único</span>
+              <span class="badge bg-light text-dark ms-2">${tarjeta}</span>
               <button class="btn btn-sm btn-danger delete-compra" data-id="${c.id}">Eliminar</button>
             </li>
           `;
@@ -147,11 +151,35 @@ document.addEventListener('DOMContentLoaded', async () => {
               [${new Date(c.fecha).toLocaleDateString()}] ${c.descripcion} — 
               $${pagoMensual} <span class="badge bg-info">Pago mensual</span>
               <span class="text-muted"> (${mesesPagados + 1}/${meses} de $${c.monto})</span>
+              <span class="badge bg-light text-dark ms-2">${tarjeta}</span>
               <button class="btn btn-sm btn-danger delete-compra" data-id="${c.id}">Eliminar</button>
             </li>
           `;
         }
       }).join('');
+
+      let totalCredito = 0;
+      let mensualidadCredito = 0;
+      let totalMensualidad = 0;
+
+      compras.forEach(c => {
+        const meses = c.meses || 1;
+        totalMensualidad += Number(c.monto) / meses;
+      });
+
+      const resumenCredito = document.getElementById('resumenCredito');
+      if (resumenCredito) {
+        if (totalMensualidad > 0) {
+          const quincenal = (totalMensualidad / 2).toFixed(2);
+          resumenCredito.innerHTML = `
+            <div class="alert alert-primary">
+              <b>Debes ahorrar quincenal:</b> $${quincenal} para cubrir todos tus gastos mensuales.
+            </div>
+          `;
+        } else {
+          resumenCredito.innerHTML = '';
+        }
+      }
     }
     // Eventos para eliminar compras
     document.querySelectorAll('.delete-compra').forEach(btn => {
@@ -312,6 +340,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadCompras();
   await loadMonthlyIncome();
   await calculateMonthlyExpenses();
-  await loadHistorial();
+  // await loadHistorial();
 
 });
