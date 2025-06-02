@@ -84,27 +84,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res = await fetch(`${API_URL}/tarjetas/${user.id}`);
       const tarjetas = await res.json();
+      
       if (tarjetas.length === 0) {
-        listaTarjetas.innerHTML = '<li>No tienes tarjetas registradas.</li>';
+        listaTarjetas.innerHTML = '<div class="alert alert-info">No tienes tarjetas registradas.</div>';
       } else {
-        listaTarjetas.innerHTML = tarjetas
-          .map(t => `
-            <li>
-              ${t.nombre} (${t.tipo}) — •••• ${t.numero}
-              <button class="btn btn-sm btn-danger delete-tarjeta" data-id="${t.id}">Eliminar</button>
-            </li>
-          `)
-          .join('');
+        // Create the container for the cards
+        listaTarjetas.innerHTML = '<div class="tarjeta-container">' + 
+          tarjetas.map(t => {
+            // Choose an icon based on card type
+            const iconClass = t.tipo === 'credito' ? 'fa-credit-card' : 'fa-money-check-alt';
+            
+            return `
+              <div class="tarjeta-item" data-tipo="${t.tipo}" data-id="${t._id}">
+                <div class="tarjeta-buttons">
+                  <button class="delete-tarjeta" data-id="${t._id}" title="Eliminar tarjeta">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                
+                <div class="tarjeta-bank-logo">
+                  <i class="fas ${iconClass}"></i>
+                </div>
+                
+                <div class="tarjeta-chip"></div>
+                
+                <p class="tarjeta-tipo">${t.tipo === 'credito' ? 'Crédito' : 'Débito'}</p>
+                <h3 class="tarjeta-nombre">${t.nombre}</h3>
+                <div class="tarjeta-numero">•••• •••• •••• ${t.numero}</div>
+              </div>
+            `;
+          }).join('') +
+        '</div>';
       }
+      
       // Botones eliminar tarjeta
       document.querySelectorAll('.delete-tarjeta').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent triggering parent click events
           openConfirmModal('¿Estás seguro de que deseas eliminar esta tarjeta?', async () => {
             await fetch(`${API_URL}/tarjetas/${button.dataset.id}`, { method: 'DELETE' });
             await loadTarjetas();
           });
         });
       });
+      
+      // Optional: Add click event to the entire card (for future functionality)
+      document.querySelectorAll('.tarjeta-item').forEach(card => {
+        card.addEventListener('click', () => {
+          // You could add functionality here in the future,
+          // like showing card details or transaction history
+          console.log(`Card clicked: ${card.querySelector('.tarjeta-nombre').textContent}`);
+        });
+      });
+      
     } catch (e) {
       console.error('Error cargando tarjetas', e);
     }
@@ -124,73 +156,132 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Función para cargar compras
   async function loadCompras() {
-    const res = await fetch(`${API_URL}/compras/${user.id}`);
-    const compras = await res.json();
-    compras.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    try {
+      const res = await fetch(`${API_URL}/compras/${user.id}`);
+      const compras = await res.json();
+      compras.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    if (compras.length === 0) {
-      listaCompras.innerHTML = '<li>No has registrado compras.</li>';
-    } else {
-      listaCompras.innerHTML = compras.map(c => {
-        const meses = c.meses || 1;
-        const mesesPagados = c.meses_pagados || 0;
-        const tarjeta = c.tarjeta_nombre ? `${c.tarjeta_nombre} (${c.tarjeta_tipo || ''})` : `Tarjeta: ${c.tarjeta_id || c.tarjeta}`;
-        if (meses === 1) {
-          return `
-            <li>
-              [${new Date(c.fecha).toLocaleDateString()}] ${c.descripcion} — 
-              $${c.monto} <span class="badge bg-secondary">Pago único</span>
-              <span class="badge bg-light text-dark ms-2">${tarjeta}</span>
-              <button class="btn btn-sm btn-danger delete-compra" data-id="${c.id}">Eliminar</button>
-            </li>
-          `;
-        } else {
-          const pagoMensual = (c.monto / meses).toFixed(2);
-          return `
-            <li>
-              [${new Date(c.fecha).toLocaleDateString()}] ${c.descripcion} — 
-              $${pagoMensual} <span class="badge bg-info">Pago mensual</span>
-              <span class="text-muted"> (${mesesPagados + 1}/${meses} de $${c.monto})</span>
-              <span class="badge bg-light text-dark ms-2">${tarjeta}</span>
-              <button class="btn btn-sm btn-danger delete-compra" data-id="${c.id}">Eliminar</button>
-            </li>
-          `;
-        }
-      }).join('');
+      if (compras.length === 0) {
+        listaCompras.innerHTML = '<div class="alert alert-info">No has registrado compras.</div>';
+      } else {
+        // Create container for purchase cards
+        listaCompras.innerHTML = '<div class="compra-container">' + 
+          compras.map(c => {
+            const meses = c.meses || 1;
+            const mesesPagados = c.meses_pagados || 0;
+            const tarjeta = c.tarjeta_nombre ? `${c.tarjeta_nombre} (${c.tarjeta_tipo || ''})` : `Tarjeta: ${c.tarjeta_id || c.tarjeta}`;
+            const fecha = new Date(c.fecha).toLocaleDateString();
+            
+            // Choose icons based on payment type
+            const paymentIcon = meses === 1 ? 'fa-money-bill-wave' : 'fa-calendar-alt';
+            const cardIcon = c.tarjeta_tipo === 'credito' ? 'fa-credit-card' : 'fa-money-check-alt';
+            
+            // Calculate progress for installment payments
+            const progressPercent = meses === 1 ? 100 : ((mesesPagados + 1) / meses) * 100;
+            
+            // Different classes for different payment types
+            const paymentClass = meses === 1 ? 'single-payment' : 'monthly-payment';
+            
+            if (meses === 1) {
+              // Single payment
+              return `
+                <div class="compra-item ${paymentClass}">
+                  <div class="compra-fecha">
+                    <i class="far fa-calendar"></i> ${fecha}
+                  </div>
+                  <div class="compra-descripcion">${c.descripcion}</div>
+                  <div class="compra-monto">$${c.monto}</div>
+                  <div class="compra-details">
+                    <span class="compra-badge payment-type">
+                      <i class="fas ${paymentIcon}"></i> Pago único
+                    </span>
+                    <span class="compra-badge card-type">
+                      <i class="fas ${cardIcon}"></i> ${tarjeta}
+                    </span>
+                  </div>
+                  <div class="compra-actions">
+                    <button class="delete-compra" data-id="${c.id}">
+                      <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                  </div>
+                </div>
+              `;
+            } else {
+              // Installment payment
+              const pagoMensual = (c.monto / meses).toFixed(2);
+              return `
+                <div class="compra-item ${paymentClass}">
+                  <div class="compra-fecha">
+                    <i class="far fa-calendar"></i> ${fecha}
+                  </div>
+                  <div class="compra-descripcion">${c.descripcion}</div>
+                  <div class="compra-monto">$${pagoMensual} <small class="text-muted">por mes</small></div>
+                  <div class="compra-details">
+                    <span class="compra-badge payment-type">
+                      <i class="fas ${paymentIcon}"></i> Pago mensual
+                    </span>
+                    <span class="compra-badge card-type">
+                      <i class="fas ${cardIcon}"></i> ${tarjeta}
+                    </span>
+                    <span class="compra-badge installment">
+                      <i class="fas fa-tasks"></i> ${mesesPagados + 1}/${meses} pagos
+                    </span>
+                  </div>
+                  <div class="compra-progress">
+                    <div class="compra-progress-bar" style="width: ${progressPercent}%"></div>
+                  </div>
+                  <div class="text-muted small">Total: $${c.monto}</div>
+                  <div class="compra-actions">
+                    <button class="delete-compra" data-id="${c.id}">
+                      <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                  </div>
+                </div>
+              `;
+            }
+          }).join('') +
+        '</div>';
 
-      let totalCredito = 0;
-      let mensualidadCredito = 0;
-      let totalMensualidad = 0;
+        // Calculate payment totals
+        let totalCredito = 0;
+        let mensualidadCredito = 0;
+        let totalMensualidad = 0;
 
-      compras.forEach(c => {
-        const meses = c.meses || 1;
-        totalMensualidad += Number(c.monto) / meses;
-      });
+        compras.forEach(c => {
+          const meses = c.meses || 1;
+          totalMensualidad += Number(c.monto) / meses;
+        });
 
-      const resumenCredito = document.getElementById('resumenCredito');
-      if (resumenCredito) {
-        if (totalMensualidad > 0) {
-          const quincenal = (totalMensualidad / 2).toFixed(2);
-          resumenCredito.innerHTML = `
-            <div class="alert alert-primary">
-              <b>Debes ahorrar quincenal:</b> $${quincenal} para cubrir todos tus gastos mensuales.
-            </div>
-          `;
-        } else {
-          resumenCredito.innerHTML = '';
+        const resumenCredito = document.getElementById('resumenCredito');
+        if (resumenCredito) {
+          if (totalMensualidad > 0) {
+            const quincenal = (totalMensualidad / 2).toFixed(2);
+            resumenCredito.innerHTML = `
+              <div class="alert alert-primary">
+                <b>Debes ahorrar quincenal:</b> $${quincenal} para cubrir todos tus gastos mensuales.
+              </div>
+            `;
+          } else {
+            resumenCredito.innerHTML = '';
+          }
         }
       }
+      
+      // Event listeners for delete buttons
+      document.querySelectorAll('.delete-compra').forEach(btn => {
+        btn.onclick = () => {
+          openConfirmModal('¿Estás seguro de que deseas eliminar esta compra?', async () => {
+            await fetch(`${API_URL}/compras/${btn.dataset.id}`, { method: 'DELETE' });
+            await loadCompras();
+            await calculateMonthlyExpenses();
+          });
+        };
+      });
+      
+    } catch (error) {
+      console.error('Error cargando compras', error);
+      listaCompras.innerHTML = '<div class="alert alert-danger">Error al cargar las compras</div>';
     }
-    // Eventos para eliminar compras
-    document.querySelectorAll('.delete-compra').forEach(btn => {
-      btn.onclick = () => {
-        openConfirmModal('¿Estás seguro de que deseas eliminar esta compra?', async () => {
-          await fetch(`${API_URL}/compras/${btn.dataset.id}`, { method: 'DELETE' });
-          await loadCompras();
-          await calculateMonthlyExpenses();
-        });
-      };
-    });
   }
 
   // Cargar tarjetas en el select con el atributo data-tipo
@@ -203,7 +294,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     compraTarjeta.dispatchEvent(new Event('change'));
   }
 
-  // Calcular gastos mensuales
   async function calculateMonthlyExpenses() {
     try {
       const res = await fetch(`${API_URL}/compras/${user.id}`);
@@ -220,7 +310,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Cargar ingresos mensuales
   async function loadMonthlyIncome() {
     try {
       const res = await fetch(`${API_URL}/users/${user.id}/ingresos`);
@@ -236,28 +325,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (monthlyIncome === 0) {
       progressBar.style.width = '0%';
       progressBar.textContent = '0%';
+      progressBar.setAttribute('data-percent', 'low');
       monthlyIncomeText.textContent = '$0';
       remainingIncomeText.textContent = '$0';
       return;
     }
+    
     const percentage = Math.min((monthlyExpenses / monthlyIncome) * 100, 100);
     const remaining = Math.max(monthlyIncome - monthlyExpenses, 0);
+    
+    if (percentage < 40) {
+      progressBar.setAttribute('data-percent', 'low');
+    } else if (percentage < 75) {
+      progressBar.setAttribute('data-percent', 'medium');
+    } else {
+      progressBar.setAttribute('data-percent', 'high');
+    }
+    
     progressBar.style.width = `${percentage}%`;
-    progressBar.textContent = `${percentage.toFixed(2)}%`;
-    document.getElementById('progressBar').style.width = percentage + '%';
-    document.getElementById('progressPercent').textContent = `${percentage.toFixed(2)}%`;
+    document.getElementById('progressPercent').textContent = `${percentage.toFixed(0)}%`;
+    
     monthlyIncomeText.textContent = `$${monthlyIncome.toFixed(2)}`;
     remainingIncomeText.textContent = `$${remaining.toFixed(2)}`;
+    
+    progressBar.classList.add('pulse');
+    setTimeout(() => progressBar.classList.remove('pulse'), 700);
   }
 
-  // Mostrar/ocultar campos de crédito según el tipo de tarjeta
   compraTarjeta.addEventListener('change', () => {
     const selected = compraTarjeta.options[compraTarjeta.selectedIndex];
     const tipo = selected ? selected.getAttribute('data-tipo') : '';
     creditoFields.style.display = tipo === 'credito' ? 'block' : 'none';
   });
 
-  // Guardar tarjeta
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const nombre = form.cardName.value;
@@ -278,7 +378,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Guardar compra
   compraForm.addEventListener('submit', async e => {
     e.preventDefault();
     const tarjetaId = compraTarjeta.value;
@@ -302,7 +401,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Guardar ingresos mensuales
   incomeForm.addEventListener('submit', async e => {
     e.preventDefault();
     const ingresos = parseFloat(document.getElementById('monthlyIncome').value);
@@ -319,7 +417,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Botón de cierre de mes
   document.getElementById('cierreMesBtn').addEventListener('click', async () => {
     if (confirm('¿Estás seguro de que deseas cerrar el mes? Las compras de este mes pasarán al historial.')) {
       try {
@@ -334,12 +431,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Inicialización
   await loadTarjetas();
   await loadTarjetasForCompra();
   await loadCompras();
   await loadMonthlyIncome();
   await calculateMonthlyExpenses();
-  // await loadHistorial();
 
 });
