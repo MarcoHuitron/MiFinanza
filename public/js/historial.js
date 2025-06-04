@@ -42,29 +42,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderHistorial() {
     const filtro = filtroMes.value;
     let datos = historial;
+    
     if (filtro) {
       const [anio, mes] = filtro.split('-');
       datos = historial.filter(h =>
         String(h.anio_historial) === anio && String(h.mes_historial).padStart(2, '0') === mes
       );
     }
+    
     if (datos.length === 0) {
-      listaHistorial.innerHTML = '<li>No hay compras en este periodo.</li>';
+      listaHistorial.innerHTML = `
+        <div class="empty-state">
+          <i class="far fa-calendar-times"></i>
+          <p>No hay compras registradas en este periodo.</p>
+        </div>
+      `;
     } else {
-      listaHistorial.innerHTML = datos.map(h => `
-        <li>
-          <div>
-            <span class="fw-bold">${h.descripcion}</span>
-            <span class="text-muted ms-2">${nombreMes(h.mes_historial)} ${h.anio_historial}</span>
-            <div class="small text-secondary">${h.fecha ? new Date(h.fecha).toLocaleDateString() : ''}</div>
-            <span class="badge bg-${h.meses > 1 ? 'info' : 'secondary'}">
-              ${h.meses > 1 ? `A meses (${h.meses})` : 'Pago único'}
-            </span>
-            <span class="ms-2">${h.tarjeta ? h.tarjeta : ''}</span>
-          </div>
-          <div class="fw-bold text-success">$${parseFloat(h.monto).toFixed(2)}</div>
-        </li>
-      `).join('');
+      // Agrupar compras por mes para una vista de línea de tiempo
+      const comprasPorMes = {};
+      
+      datos.forEach(item => {
+        const key = `${item.anio_historial}-${String(item.mes_historial).padStart(2, '0')}`;
+        if (!comprasPorMes[key]) {
+          comprasPorMes[key] = [];
+        }
+        comprasPorMes[key].push(item);
+      });
+      
+      // Ordenar los meses cronológicamente
+      const mesesOrdenados = Object.keys(comprasPorMes).sort().reverse();
+      
+      let html = '<ul class="timeline">';
+      
+      mesesOrdenados.forEach(mes => {
+        const [year, monthNum] = mes.split('-');
+        const monthName = nombreMes(monthNum);
+        
+        html += `<div class="month-divider">${monthName} ${year}</div>`;
+        
+        // Ordenar compras dentro de cada mes por fecha (más reciente primero)
+        const comprasDelMes = comprasPorMes[mes].sort((a, b) => 
+          new Date(b.fecha || 0) - new Date(a.fecha || 0)
+        );
+        
+        comprasDelMes.forEach(item => {
+          const paymentClass = item.meses > 1 ? 'monthly-payment' : 'single-payment';
+          const fecha = item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
+          const paymentIcon = item.meses > 1 ? 'fa-calendar-alt' : 'fa-money-bill-wave';
+          const cardIcon = 'fa-credit-card';
+          
+          html += `
+            <li class="timeline-item ${paymentClass}">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <h3 class="timeline-title">${item.descripcion}</h3>
+                  <div class="timeline-amount">$${parseFloat(item.monto).toFixed(2)}</div>
+                </div>
+                <div class="timeline-date">
+                  <i class="far fa-calendar-alt"></i> ${fecha}
+                </div>
+                <div class="timeline-badges">
+                  <span class="timeline-badge payment-type">
+                    <i class="fas ${paymentIcon}"></i> 
+                    ${item.meses > 1 ? `${item.meses} meses` : 'Pago único'}
+                  </span>
+                  ${item.tarjeta ? `
+                  <span class="timeline-badge card-type">
+                    <i class="fas ${cardIcon}"></i> ${item.tarjeta}
+                  </span>
+                  ` : ''}
+                </div>
+              </div>
+            </li>
+          `;
+        });
+      });
+      
+      html += '</ul>';
+      listaHistorial.innerHTML = html;
     }
   }
 

@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let monthlyIncome = 0;
   let monthlyExpenses = 0;
 
+  let editMode = false;
+  let currentEditId = null;
+
   // Modales Bootstrap
   const cardModal = new bootstrap.Modal(document.getElementById('cardModal'));
   const compraModalInstance = new bootstrap.Modal(document.getElementById('compraModal'));
@@ -200,7 +203,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </span>
                   </div>
                   <div class="compra-actions">
-                    <button class="delete-compra" data-id="${c.id}">
+                    <button class="edit-compra" data-id="${c._id || c.id}">
+                      <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="delete-compra" data-id="${c._id || c.id}">
                       <i class="fas fa-trash-alt"></i> Eliminar
                     </button>
                   </div>
@@ -232,7 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                   </div>
                   <div class="text-muted small">Total: $${c.monto}</div>
                   <div class="compra-actions">
-                    <button class="delete-compra" data-id="${c.id}">
+                    <button class="edit-compra" data-id="${c._id || c.id}">
+                      <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="delete-compra" data-id="${c._id || c.id}">
                       <i class="fas fa-trash-alt"></i> Eliminar
                     </button>
                   </div>
@@ -270,11 +279,68 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Event listeners for delete buttons
       document.querySelectorAll('.delete-compra').forEach(btn => {
         btn.onclick = () => {
+          const id = btn.dataset.id;
+          console.log("Deleting purchase with ID:", id);
+          
           openConfirmModal('¿Estás seguro de que deseas eliminar esta compra?', async () => {
-            await fetch(`${API_URL}/compras/${btn.dataset.id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/compras/${id}`, { method: 'DELETE' });
             await loadCompras();
             await calculateMonthlyExpenses();
           });
+        };
+      });
+      
+      // Event listeners for edit buttons
+      document.querySelectorAll('.edit-compra').forEach(btn => {
+        btn.onclick = async () => {
+          // Get the purchase ID
+          const purchaseId = btn.dataset.id;
+          console.log("Editing purchase with ID:", purchaseId);
+          
+          // Fetch the purchase data
+          try {
+            const response = await fetch(`${API_URL}/compras/compra/${purchaseId}`);
+            const purchase = await response.json();
+            
+            // Set edit mode
+            editMode = true;
+            currentEditId = purchaseId;
+            
+            // Populate the form with existing data
+            document.getElementById('compraDescripcion').value = purchase.descripcion;
+            document.getElementById('compraMonto').value = purchase.monto;
+            
+            // Select the correct card in the dropdown
+            const cardSelect = document.getElementById('compraTarjeta');
+            for (let i = 0; i < cardSelect.options.length; i++) {
+              if (cardSelect.options[i].value === purchase.tarjeta_id) {
+                cardSelect.selectedIndex = i;
+                break;
+              }
+            }
+            
+            // Handle installment options if applicable
+            if (purchase.meses > 1) {
+              document.getElementById('creditoFields').style.display = 'block';
+              const mesesSelect = document.getElementById('compraMeses');
+              for (let i = 0; i < mesesSelect.options.length; i++) {
+                if (parseInt(mesesSelect.options[i].value) === purchase.meses) {
+                  mesesSelect.selectedIndex = i;
+                  break;
+                }
+              }
+            } else {
+              document.getElementById('creditoFields').style.display = 'none';
+            }
+            
+            // Update modal title
+            document.querySelector('#compraModal .modal-title').textContent = 'Editar Compra';
+            
+            // Show the modal
+            compraModalInstance.show();
+          } catch (error) {
+            console.error('Error fetching purchase for edit:', error);
+          }
         };
       });
       
@@ -386,18 +452,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     const meses = compraForm.compraMeses ? compraForm.compraMeses.value : 1;
 
     try {
-      await fetch(`${API_URL}/compras`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario_id: user.id, tarjeta_id: tarjetaId, descripcion, monto, meses })
-      });
+      if (editMode) {
+        console.log("Updating purchase with ID:", currentEditId);
+        
+        // Update existing purchase
+        const response = await fetch(`${API_URL}/compras/${currentEditId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            usuario_id: user.id, 
+            tarjeta_id: tarjetaId, 
+            descripcion, 
+            monto, 
+            meses 
+          })
+        });
+        
+        console.log("Update response status:", response.status);
+        // Check if the response is JSON before trying to parse it
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const responseData = await response.json();
+          console.log("Update response data:", responseData);
+        } else {
+          // Handle non-JSON response
+          const textResponse = await response.text();
+          console.error("Non-JSON response:", textResponse.substring(0, 100) + "...");
+          throw new Error("Server returned non-JSON response. Please check server logs.");
+        }
+        
+        // Reset edit mode
+        editMode = false;
+        currentEditId = null;
+        
+        // Reset modal title
+        document.querySelector('#compraModal .modal-title').textContent = 'Agregar Compra';
+      } else {
+        // Create new purchase (existing code)
+        await fetch(`${API_URL}/compras`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario_id: user.id, tarjeta_id: tarjetaId, descripcion, monto, meses })
+        });
+      }
+      
+      // Common actions for both create and update
       compraForm.reset();
       creditoFields.style.display = 'none';
       compraModalInstance.hide();
       await loadCompras();
       await calculateMonthlyExpenses();
     } catch (err) {
-      console.error('Error guardando compra', err);
+      console.error('Error processing purchase:', err);
+      alert(`Error: ${err.message}`);
     }
   });
 
@@ -429,6 +536,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Error al realizar el cierre de mes.');
       }
     }
+  });
+
+  // Reset the form when the modal is closed
+  document.getElementById('compraModal').addEventListener('hidden.bs.modal', () => {
+    editMode = false;
+    currentEditId = null;
+    compraForm.reset();
+    document.querySelector('#compraModal .modal-title').textContent = 'Agregar Compra';
+    creditoFields.style.display = 'none';
   });
 
   await loadTarjetas();

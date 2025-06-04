@@ -27,7 +27,7 @@ router.get('/:userId', async (req, res) => {
 // POST /api/compras
 router.post('/', async (req, res) => {
   const { usuario_id, tarjeta_id, descripcion, monto, meses } = req.body;
-  console.log('Datos recibidos:', req.body); // <-- Agrega esto
+  console.log('Datos recibidos:', req.body);
   if (!usuario_id || !tarjeta_id || !descripcion || !monto) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
@@ -110,6 +110,32 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
   } catch (err) {
     console.error('Error en cierre de mes:', err);
     res.status(500).json({ error: 'Error al reiniciar el mes' });
+  }
+});
+
+// PUT /api/compras/:id
+router.put('/:id', async (req, res) => {
+  try {
+    const { descripcion, monto, meses } = req.body;
+    const compraActualizada = await Compra.findByIdAndUpdate(
+      req.params.id,
+      { descripcion, monto, meses },
+      { new: true }
+    );
+    res.json({ success: true, compraActualizada });
+  } catch (e) {
+    res.status(500).json({ error: 'Error actualizando compra' });
+  }
+});
+
+// GET /api/compras/compra/:id
+router.get('/compra/:id', async (req, res) => {
+  try {
+    const compra = await Compra.findById(req.params.id);
+    if (!compra) return res.status(404).json({ error: 'Compra no encontrada' });
+    res.json(compra);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al buscar la compra' });
   }
 });
 

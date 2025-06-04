@@ -500,6 +500,28 @@ body {
   margin-top: auto;
 }
 
+.edit-compra {
+  background-color: transparent;
+  color: #2196F3;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  margin-right: 8px;
+}
+
+.edit-compra i {
+  margin-right: 4px;
+}
+
+.edit-compra:hover {
+  background-color: #E3F2FD;
+}
+
 .delete-compra {
   background-color: transparent;
   color: #e74c3c;
@@ -521,27 +543,69 @@ body {
   background-color: #ffebee;
 }
 
-/* Mobile responsive adjustments */
+/* Header gradient and button enhancements */
+.bg-gradient-primary {
+  background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.navbar-brand img {
+  transition: transform 0.2s;
+}
+.navbar-brand img:hover {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.navbar .btn {
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.navbar .btn-warning {
+  color: #1e3c72;
+  background: linear-gradient(90deg, #ffd600 0%, #ffb300 100%);
+  border: none;
+}
+.navbar .btn-warning:hover {
+  background: linear-gradient(90deg, #ffb300 0%, #ffd600 100%);
+  color: #1e3c72;
+}
+
+.navbar .btn-info {
+  background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+  border: none;
+}
+.navbar .btn-info:hover {
+  background: linear-gradient(90deg, #0072ff 0%, #00c6ff 100%);
+  color: #fff;
+}
+
+.navbar .btn-danger {
+  background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+  border: none;
+}
+.navbar .btn-danger:hover {
+  background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
+  color: #fff;
+}
+
+.navbar .badge {
+  font-size: 1rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px #0001;
+}
+
 @media (max-width: 768px) {
-  .compra-container {
-    grid-template-columns: 1fr;
-    gap: 12px;
+  .navbar .container {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
   }
-  
-  .compra-item {
-    padding: 14px;
+  .navbar .d-flex {
+    flex-wrap: wrap;
+    gap: 8px;
   }
-  
-  .compra-descripcion {
-    font-size: 1rem;
-  }
-  
-  .compra-details {
-    margin-bottom: 8px;
-  }
-  
-  .delete-compra {
-    padding: 8px 12px;
-    font-size: 0.9rem;
+  .navbar-brand span {
+    font-size: 1.1rem;
   }
 }

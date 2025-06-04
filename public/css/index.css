@@ -114,6 +114,7 @@ body {
   margin-bottom: 16px;
   letter-spacing: 0.5px;
 }
+
 @media (max-width: 768px) {
   .hero {
     padding: 48px 0 24px 0;
