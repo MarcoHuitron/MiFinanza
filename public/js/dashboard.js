@@ -189,7 +189,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                       <i class="far fa-calendar"></i> ${fecha}
                     </div>
                     <div class="compra-descripcion">${c.descripcion}</div>
-                    <div class="compra-monto">$${c.monto}</div>
+                    <div class="compra-monto">
+                      ${meses > 1 
+                        ? `$${(c.monto / meses).toFixed(2)} <small class="text-muted">de $${c.monto}</small>` 
+                        : `$${c.monto}`}
+                    </div>
                   </div>
                   <div>
                     <input type="checkbox" class="form-check-input ms-2 mark-paid" data-id="${c._id || c.id}" ${c.pagada ? 'checked' : ''} title="Marcar como pagada">
@@ -197,11 +201,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <div class="compra-details">
                   <span class="compra-badge payment-type">
-                    <i class="fas ${paymentIcon}"></i> Pago único
+                    <i class="fas ${paymentIcon}"></i> ${meses === 1 ? 'Pago único' : `Pago a meses (${mesesPagados}/${meses})`}
                   </span>
                   <span class="compra-badge card-type">
                     <i class="fas ${cardIcon}"></i> ${tarjeta}
                   </span>
+                  ${meses > 1 ? `
+                  <div class="mt-2">
+                    <div class="progress" style="height: 10px;">
+                      <div class="progress-bar" role="progressbar" style="width: ${progressPercent}%;" 
+                          aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                  ` : ''}
                 </div>
                 <div class="compra-actions">
                   <button class="edit-compra" data-id="${c._id || c.id}">
