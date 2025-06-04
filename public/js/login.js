@@ -13,14 +13,25 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
   const email = document.getElementById('email').value.trim();
   const contraseña = document.getElementById('password').value;
-
   const mensaje = document.getElementById('mensaje');
+  const loginButton = document.getElementById('loginButton');
+  const buttonContent = document.querySelector('.button-content');
+  const spinnerContainer = document.querySelector('.spinner-container');
+
+  // Show loading spinner
+  buttonContent.classList.add('d-none');
+  spinnerContainer.classList.remove('d-none');
+  loginButton.disabled = true;
 
   // Validar email
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(email)) {
     mensaje.textContent = 'Por favor, ingresa un correo electrónico válido.';
     mensaje.style.color = 'red';
+    // Hide loading spinner
+    buttonContent.classList.remove('d-none');
+    spinnerContainer.classList.add('d-none');
+    loginButton.disabled = false;
     return;
   }
 
@@ -28,6 +39,10 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   if (contraseña.length < 6) {
     mensaje.textContent = 'La contraseña debe tener al menos 6 caracteres.';
     mensaje.style.color = 'red';
+    // Hide loading spinner
+    buttonContent.classList.remove('d-none');
+    spinnerContainer.classList.add('d-none');
+    loginButton.disabled = false;
     return;
   }
 
@@ -49,9 +64,17 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     } else {
       mensaje.textContent = data.error;
       mensaje.style.color = 'red';
+      // Hide loading spinner
+      buttonContent.classList.remove('d-none');
+      spinnerContainer.classList.add('d-none');
+      loginButton.disabled = false;
     }
   } catch (error) {
     mensaje.textContent = 'Error al conectar con el servidor.';
     mensaje.style.color = 'red';
+    // Hide loading spinner
+    buttonContent.classList.remove('d-none');
+    spinnerContainer.classList.add('d-none');
+    loginButton.disabled = false;
   }
 });

@@ -56,6 +56,10 @@ body {
   background: #ffb300;
   color: #fff;
 }
+.btn-login:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
 .extra-links {
   text-align: center;
   margin-top: 18px;
@@ -76,6 +80,11 @@ body {
   font-weight: 500;
   color: #ffeb3b;
   min-height: 24px;
+}
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 @keyframes fadeInDown {
   from {
