@@ -609,3 +609,33 @@ body {
     font-size: 1.1rem;
   }
 }
+
+.compra-item.pagada {
+  opacity: 0.85;
+  border-left: 6px solid #43a047 !important;
+  box-shadow: 0 0 16px 2px #43a04744, 0 3px 10px rgba(0,0,0,0.08);
+  background: linear-gradient(90deg, #e8f5e9 60%, #ffffff 100%);
+}
+
+/* Añade esto a tu dashboard.css */
+.form-check-input {
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: 0.25em;
+  cursor: pointer;
+  border: 2px solid #ddd;
+}
+
+.form-check-input:checked {
+  background-color: #43a047;
+  border-color: #43a047;
+  box-shadow: 0 0 0 0.25rem rgba(67, 160, 71, 0.25);
+}
+
+/* Aumenta el tamaño en móvil para facilitar el toque */
+@media (max-width: 768px) {
+  .form-check-input {
+    width: 1.4em;
+    height: 1.4em;
+  }
+}

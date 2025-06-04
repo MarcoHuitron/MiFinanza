@@ -8,7 +8,6 @@ const HistorialCompra = require('../models/HistorialCompra');
 router.get('/:userId', async (req, res) => {
   try {
     const compras = await Compra.find({ usuario_id: req.params.userId }).populate('tarjeta_id');
-    // Formatea la respuesta para incluir el nombre de la tarjeta
     const result = compras.map(c => ({
       id: c._id,
       descripcion: c.descripcion,
@@ -16,7 +15,8 @@ router.get('/:userId', async (req, res) => {
       fecha: c.fecha,
       meses: c.meses,
       meses_pagados: c.meses_pagados,
-      tarjeta: c.tarjeta_id?.nombre || ''
+      tarjeta: c.tarjeta_id?.nombre || '',
+      pagada: c.pagada
     }));
     res.json(result);
   } catch (err) {
@@ -116,14 +116,25 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
 // PUT /api/compras/:id
 router.put('/:id', async (req, res) => {
   try {
-    const { descripcion, monto, meses } = req.body;
-    const compraActualizada = await Compra.findByIdAndUpdate(
-      req.params.id,
-      { descripcion, monto, meses },
-      { new: true }
-    );
-    res.json({ success: true, compraActualizada });
+    // Busca la compra primero para preservar campos existentes
+    const compra = await Compra.findById(req.params.id);
+    if (!compra) {
+      return res.status(404).json({ error: 'Compra no encontrada' });
+    }
+    
+    // Actualiza solo los campos que vienen en el body
+    if (req.body.pagada !== undefined) compra.pagada = req.body.pagada;
+    if (req.body.descripcion) compra.descripcion = req.body.descripcion;
+    if (req.body.monto) compra.monto = req.body.monto;
+    if (req.body.meses) compra.meses = req.body.meses;
+    if (req.body.tarjeta_id) compra.tarjeta_id = req.body.tarjeta_id;
+    
+    // Guarda los cambios
+    await compra.save();
+    
+    res.json({ success: true, compra });
   } catch (e) {
+    console.error('Error actualizando compra:', e);
     res.status(500).json({ error: 'Error actualizando compra' });
   }
 });

@@ -7,7 +7,8 @@ const compraSchema = new mongoose.Schema({
   monto: { type: Number, required: true },
   fecha: { type: Date, default: Date.now },
   meses: { type: Number, default: 1 },
-  meses_pagados: { type: Number, default: 0 }
+  meses_pagados: { type: Number, default: 0 },
+  pagada: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model('Compra', compraSchema);

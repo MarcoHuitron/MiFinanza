@@ -91,10 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tarjetas.length === 0) {
         listaTarjetas.innerHTML = '<div class="alert alert-info">No tienes tarjetas registradas.</div>';
       } else {
-        // Create the container for the cards
         listaTarjetas.innerHTML = '<div class="tarjeta-container">' + 
           tarjetas.map(t => {
-            // Choose an icon based on card type
             const iconClass = t.tipo === 'credito' ? 'fa-credit-card' : 'fa-money-check-alt';
             
             return `
@@ -123,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Botones eliminar tarjeta
       document.querySelectorAll('.delete-tarjeta').forEach(button => {
         button.addEventListener('click', (e) => {
-          e.stopPropagation(); // Prevent triggering parent click events
+          e.stopPropagation(); 
           openConfirmModal('¿Estás seguro de que deseas eliminar esta tarjeta?', async () => {
             await fetch(`${API_URL}/tarjetas/${button.dataset.id}`, { method: 'DELETE' });
             await loadTarjetas();
@@ -131,11 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
       
-      // Optional: Add click event to the entire card (for future functionality)
       document.querySelectorAll('.tarjeta-item').forEach(card => {
         card.addEventListener('click', () => {
-          // You could add functionality here in the future,
-          // like showing card details or transaction history
           console.log(`Card clicked: ${card.querySelector('.tarjeta-nombre').textContent}`);
         });
       });
@@ -185,69 +180,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Different classes for different payment types
             const paymentClass = meses === 1 ? 'single-payment' : 'monthly-payment';
             
-            if (meses === 1) {
-              // Single payment
-              return `
-                <div class="compra-item ${paymentClass}">
-                  <div class="compra-fecha">
-                    <i class="far fa-calendar"></i> ${fecha}
+            // Single payment
+            return `
+              <div class="compra-item ${paymentClass} ${c.pagada ? 'pagada' : ''}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="compra-fecha">
+                      <i class="far fa-calendar"></i> ${fecha}
+                    </div>
+                    <div class="compra-descripcion">${c.descripcion}</div>
+                    <div class="compra-monto">$${c.monto}</div>
                   </div>
-                  <div class="compra-descripcion">${c.descripcion}</div>
-                  <div class="compra-monto">$${c.monto}</div>
-                  <div class="compra-details">
-                    <span class="compra-badge payment-type">
-                      <i class="fas ${paymentIcon}"></i> Pago único
-                    </span>
-                    <span class="compra-badge card-type">
-                      <i class="fas ${cardIcon}"></i> ${tarjeta}
-                    </span>
-                  </div>
-                  <div class="compra-actions">
-                    <button class="edit-compra" data-id="${c._id || c.id}">
-                      <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="delete-compra" data-id="${c._id || c.id}">
-                      <i class="fas fa-trash-alt"></i> Eliminar
-                    </button>
+                  <div>
+                    <input type="checkbox" class="form-check-input ms-2 mark-paid" data-id="${c._id || c.id}" ${c.pagada ? 'checked' : ''} title="Marcar como pagada">
                   </div>
                 </div>
-              `;
-            } else {
-              // Installment payment
-              const pagoMensual = (c.monto / meses).toFixed(2);
-              return `
-                <div class="compra-item ${paymentClass}">
-                  <div class="compra-fecha">
-                    <i class="far fa-calendar"></i> ${fecha}
-                  </div>
-                  <div class="compra-descripcion">${c.descripcion}</div>
-                  <div class="compra-monto">$${pagoMensual} <small class="text-muted">por mes</small></div>
-                  <div class="compra-details">
-                    <span class="compra-badge payment-type">
-                      <i class="fas ${paymentIcon}"></i> Pago mensual
-                    </span>
-                    <span class="compra-badge card-type">
-                      <i class="fas ${cardIcon}"></i> ${tarjeta}
-                    </span>
-                    <span class="compra-badge installment">
-                      <i class="fas fa-tasks"></i> ${mesesPagados + 1}/${meses} pagos
-                    </span>
-                  </div>
-                  <div class="compra-progress">
-                    <div class="compra-progress-bar" style="width: ${progressPercent}%"></div>
-                  </div>
-                  <div class="text-muted small">Total: $${c.monto}</div>
-                  <div class="compra-actions">
-                    <button class="edit-compra" data-id="${c._id || c.id}">
-                      <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="delete-compra" data-id="${c._id || c.id}">
-                      <i class="fas fa-trash-alt"></i> Eliminar
-                    </button>
-                  </div>
+                <div class="compra-details">
+                  <span class="compra-badge payment-type">
+                    <i class="fas ${paymentIcon}"></i> Pago único
+                  </span>
+                  <span class="compra-badge card-type">
+                    <i class="fas ${cardIcon}"></i> ${tarjeta}
+                  </span>
                 </div>
-              `;
-            }
+                <div class="compra-actions">
+                  <button class="edit-compra" data-id="${c._id || c.id}">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <button class="delete-compra" data-id="${c._id || c.id}">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                  </button>
+                </div>
+              </div>
+            `;
           }).join('') +
         '</div>';
 
@@ -342,6 +307,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error fetching purchase for edit:', error);
           }
         };
+      });
+      
+      // Evento para marcar/desmarcar compras como pagadas
+      document.querySelectorAll('.mark-paid').forEach(checkbox => {
+        checkbox.addEventListener('change', async function() {
+          const id = this.dataset.id;
+          const pagada = this.checked;
+          
+          try {
+            // Actualiza visualmente mientras se procesa la petición
+            const compraItem = this.closest('.compra-item');
+            if (pagada) {
+              compraItem.classList.add('pagada');
+            } else {
+              compraItem.classList.remove('pagada');
+            }
+            
+            // Envía la actualización al servidor
+            const response = await fetch(`${API_URL}/compras/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pagada })
+            });
+            
+            if (!response.ok) {
+              throw new Error('Error al actualizar');
+            }
+            
+            console.log('Compra marcada como ' + (pagada ? 'pagada' : 'no pagada'));
+            
+          } catch (err) {
+            console.error('Error al marcar como pagada:', err);
+            alert('No se pudo actualizar el estado de la compra');
+            this.checked = !pagada; // Revierte el estado del checkbox
+            
+            // También revierte la clase visual
+            const compraItem = this.closest('.compra-item');
+            if (!pagada) {
+              compraItem.classList.add('pagada');
+            } else {
+              compraItem.classList.remove('pagada');
+            }
+          }
+        });
       });
       
     } catch (error) {
@@ -547,6 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     creditoFields.style.display = 'none';
   });
 
+  
   await loadTarjetas();
   await loadTarjetasForCompra();
   await loadCompras();
