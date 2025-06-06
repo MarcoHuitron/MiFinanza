@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Deudores - MiFinanza</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/ingresos.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="container my-4">
+    <div class="page-header">
+      <h2 class="page-title"><i class="fas fa-users me-2 text-primary"></i>Gestión de Deudores</h2>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title"><i class="fas fa-user-plus"></i>Agregar Deudor</h5>
+      </div>
+      <div class="card-body">
+        <form id="formDeudor" class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Nombre del deudor</label>
+            <input type="text" class="form-control" name="nombre" placeholder="Nombre completo" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Monto total</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" name="montoTotal" placeholder="0.00" required>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Número de meses</label>
+            <input type="number" class="form-control" name="totalMeses" placeholder="12" min="1" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Día de pago</label>
+            <input type="number" class="form-control" name="diaPago" placeholder="15" min="1" max="31" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" name="descripcion" placeholder="Motivo de la deuda" required>
+          </div>
+          <div class="col-md-3 offset-md-9 d-flex align-items-end justify-content-end">
+            <button type="submit" class="btn btn-success" style="width: auto; min-width: 180px;">
+              <i class="fas fa-plus me-1"></i> Agregar Deudor
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title"><i class="fas fa-list"></i>Lista de Deudores</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive table-container">
+          <table class="table table-hover" id="tablaDeudores">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Monto Total</th>
+                <th>Cuota</th>
+                <th>Progreso</th>
+                <th>Próximo Pago</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Deudores se cargarán aquí -->
+              <tr class="empty-state">
+                <td colspan="8">
+                  <i class="fas fa-user-friends"></i>
+                  <p>No hay deudores registrados</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/components/navbar.js"></script>
+  <script src="js/deudores.js"></script>
+</body>
+</html>

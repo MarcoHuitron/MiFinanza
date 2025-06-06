@@ -1,0 +1,259 @@
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3f37c9;
+  --success-color: #4cc9f0;
+  --danger-color: #f72585;
+  --warning-color: #ff9e00;
+  --light-bg: #f8f9fa;
+  --card-border-radius: 0.8rem;
+  --transition-speed: 0.3s;
+}
+
+body {
+  background-color: #1e3c72;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.page-header {
+  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+.card {
+  border: none;
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.09);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1.25rem 1.5rem;
+}
+
+.card-title {
+  margin-bottom: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.card-title i {
+  margin-right: 0.5rem;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Tabs styling */
+.nav-tabs {
+  border-bottom: none;
+  background-color: #fff;
+  border-radius: var(--card-border-radius);
+  padding: 0.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem !important;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--card-border-radius);
+  color: #6c757d;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+  margin: 0 0.25rem;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--primary-color);
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+  color: white;
+  background-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link.active i {
+  color: white;
+}
+
+/* Form styling */
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid #e0e0e0;
+  transition: all var(--transition-speed);
+  box-shadow: none;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.form-control::placeholder {
+  color: #adb5bd;
+}
+
+.btn {
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: all var(--transition-speed);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.btn-success:hover {
+  background-color: #39b0d6;
+  border-color: #39b0d6;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: #e41270;
+  border-color: #e41270;
+}
+
+/* Table styling */
+.table-container {
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  background-color: rgba(0, 0, 0, 0.02);
+  vertical-align: middle;
+  padding: 0.75rem 1rem;
+  color: #6c757d;
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+  color: #495057;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.table tr:hover {
+  background-color: rgba(67, 97, 238, 0.03);
+}
+
+/* Status badges */
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  border-radius: 50rem;
+}
+
+.badge-success {
+  background-color: rgba(76, 201, 240, 0.15);
+  color: var(--success-color);
+}
+
+.badge-warning {
+  background-color: rgba(255, 158, 0, 0.15);
+  color: var(--warning-color);
+}
+
+.badge-danger {
+  background-color: rgba(247, 37, 133, 0.15);
+  color: var(--danger-color);
+}
+
+.badge i {
+  margin-right: 0.25rem;
+}
+
+/* Amount styling */
+.amount {
+  font-weight: 600;
+  color: #333;
+}
+
+.amount-positive {
+  color: #2ecc71;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #adb5bd;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.empty-state p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+/* Animation effects */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1.25rem;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 0.6rem 1rem;
+  }
+  
+  .table td, .table th {
+    padding: 0.75rem;
+  }
+}
+
+.tab-content { margin-top: 2rem; }
+    .table th, .table td { vertical-align: middle; }

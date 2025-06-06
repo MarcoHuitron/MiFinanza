@@ -8,7 +8,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-  origin: ['https://myfinanza.netlify.app', 'http://localhost:3000'], // <-- Agrega aquí tu dominio de Netlify y local
+  origin: ['https://myfinanza.netlify.app', 'http://localhost:3000'], 
   credentials: true
 }));
 
@@ -25,6 +25,9 @@ const historialRoutes = require('./routes/historial');
 app.use('/api/historial', historialRoutes);
 const soporteRoutes = require('./routes/soporte');
 app.use('/api/soporte', soporteRoutes);
+const ingresosRoutes = require('./routes/ingresos');
+app.use('/api/ingresos', ingresosRoutes);
+app.use('/api/deudores', require('./routes/deudores'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
