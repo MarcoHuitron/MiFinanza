@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Ingreso = require('../models/ingresos');
+// Cambia esta línea para usar el nombre exacto del archivo
+const Ingreso = require('../models/Ingresos');
 
 // GET /api/ingresos/:userId
 // Obtener todos los ingresos de un usuario
