@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Ingreso = require('../models/ingresos');
+const Ingreso = require('../models/Ingresos');
 
 // GET /api/ingresos/:userId
 // Obtener todos los ingresos de un usuario
