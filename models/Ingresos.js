@@ -41,4 +41,4 @@ ingresoSchema.pre('validate', function(next) {
   next();
 });
 
-module.exports = mongoose.model('Ingreso', ingresoSchema);
+module.exports = mongoose.model('Ingresos', ingresoSchema);
