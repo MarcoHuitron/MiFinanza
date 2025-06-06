@@ -11,7 +11,6 @@
 
 body {
   background-color: #1e3c72;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .page-header {
@@ -64,41 +63,6 @@ body {
   padding: 1.5rem;
 }
 
-/* Tabs styling */
-.nav-tabs {
-  border-bottom: none;
-  background-color: #fff;
-  border-radius: var(--card-border-radius);
-  padding: 0.25rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  margin-bottom: 1.5rem !important;
-}
-
-.nav-tabs .nav-link {
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: var(--card-border-radius);
-  color: #6c757d;
-  font-weight: 500;
-  transition: all var(--transition-speed);
-  margin: 0 0.25rem;
-}
-
-.nav-tabs .nav-link:hover {
-  color: var(--primary-color);
-  background-color: rgba(67, 97, 238, 0.05);
-}
-
-.nav-tabs .nav-link.active {
-  color: white;
-  background-color: var(--primary-color);
-  font-weight: 600;
-}
-
-.nav-tabs .nav-link.active i {
-  color: white;
-}
-
 /* Form styling */
 .form-control, .form-select {
   border-radius: 0.5rem;
@@ -117,29 +81,23 @@ body {
   color: #adb5bd;
 }
 
-.btn {
-  border-radius: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-weight: 500;
-  transition: all var(--transition-speed);
-}
-
-.btn-success {
+/* Modificamos los estilos de botones para que no afecten al navbar */
+.card .btn-success {
   background-color: var(--success-color);
   border-color: var(--success-color);
 }
 
-.btn-success:hover {
+.card .btn-success:hover {
   background-color: #39b0d6;
   border-color: #39b0d6;
 }
 
-.btn-danger {
+.card .btn-danger {
   background-color: var(--danger-color);
   border-color: var(--danger-color);
 }
 
-.btn-danger:hover {
+.card .btn-danger:hover {
   background-color: #e41270;
   border-color: #e41270;
 }
@@ -176,8 +134,8 @@ body {
   background-color: rgba(67, 97, 238, 0.03);
 }
 
-/* Status badges */
-.badge {
+/* Status badges - modificamos para que no afecten al navbar */
+.card .badge, .table .badge {
   padding: 0.5rem 0.75rem;
   font-weight: 500;
   border-radius: 50rem;
@@ -246,14 +204,10 @@ body {
     padding: 1.25rem;
   }
   
-  .nav-tabs .nav-link {
-    padding: 0.6rem 1rem;
-  }
-  
   .table td, .table th {
     padding: 0.75rem;
   }
 }
 
 .tab-content { margin-top: 2rem; }
-    .table th, .table td { vertical-align: middle; }
+.table th, .table td { vertical-align: middle; }
