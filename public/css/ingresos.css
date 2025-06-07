@@ -209,5 +209,90 @@ body {
   }
 }
 
-.tab-content { margin-top: 2rem; }
-.table th, .table td { vertical-align: middle; }
+/* Improved table responsiveness for mobile */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  /* Add subtle horizontal scroll indicator */
+  background-image: 
+    linear-gradient(to right, white, white),
+    linear-gradient(to right, white, white),
+    linear-gradient(to right, rgba(0,0,0,0.05), rgba(255,255,255,0)),
+    linear-gradient(to left, rgba(0,0,0,0.05), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .table th, .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  
+  /* Highlight row on touch for better UX */
+  .table tr:active {
+    background-color: rgba(67, 97, 238, 0.07);
+  }
+  
+  /* Optimize column widths for mobile */
+  .table th:nth-child(1), .table td:nth-child(1) { min-width: 120px; } /* Descripción */
+  .table th:nth-child(2), .table td:nth-child(2) { min-width: 80px; }  /* Monto */
+  .table th:nth-child(3), .table td:nth-child(3) { min-width: 90px; }  /* Categoría */
+  .table th:nth-child(4), .table td:nth-child(4) { min-width: 100px; } /* Fecha */
+  .table th:nth-child(5), .table td:nth-child(5) { min-width: 120px; } /* Notas */
+  .table th:nth-child(6), .table td:nth-child(6) { min-width: 100px; } /* Acciones */
+  
+  /* Add hint for scrollable table */
+  .table-container:after {
+    content: '← Deslizar →';
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    color: #6c757d;
+    background-color: rgba(0,0,0,0.02);
+    border-top: 1px solid #f1f1f1;
+  }
+  
+  /* Card body padding adjustment for more space */
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  /* Form adjustments for better mobile layout */
+  #formIngresoExtra .col-md-2,
+  #formIngresoExtra .col-md-3 {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Extra small devices (phones) */
+@media (max-width: 576px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  /* Stacking form elements on very small screens */
+  #formIngresoExtra [class*="col-"] {
+    width: 100%;
+  }
+  
+  /* Make action buttons easier to tap */
+  .table .btn {
+    padding: 0.4rem 0.6rem;
+    margin: 0.1rem 0;
+  }
+  
+  /* Stack buttons in action column */
+  .table td:last-child .btn {
+    display: block;
+    width: 100%;
+  }
+}

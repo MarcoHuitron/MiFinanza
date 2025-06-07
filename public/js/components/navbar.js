@@ -87,37 +87,116 @@ function cargarNavbar() {
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
     }
 
+    /* Hamburger menu button */
+    .navbar-toggler {
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-left: auto;
+      display: none;
+    }
+    
+    .navbar-toggler:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+    
+    .navbar-toggler-icon {
+      display: inline-block;
+      width: 1.5em;
+      height: 1.5em;
+      vertical-align: middle;
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+    }
+
+    /* Responsive styles */
     @media (max-width: 992px) {
       .navbar .container {
+        flex-wrap: nowrap;
+      }
+      
+      .navbar-toggler {
+        display: block;
+      }
+      
+      .navbar-collapse {
+        position: fixed;
+        top: 0;
+        right: -280px;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        z-index: 1000;
+        transition: right 0.3s ease;
+        padding: 1rem;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        display: flex;
         flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
       }
-      .navbar .d-flex {
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
+      
+      .navbar-collapse.show {
+        right: 0;
+      }
+      
+      .navbar-close {
+        align-self: flex-end;
+        color: white;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .navbar .nav-items {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        gap: 10px;
       }
+      
       .navbar-brand span {
         font-size: 1.1rem;
+      }
+      
+      .navbar img {
+        width: 50px;
       }
     }
     
     @media (max-width: 576px) {
-      .navbar .d-flex {
-        flex-direction: column;
+      .navbar-brand {
+        font-size: 0.9rem;
       }
       
       .navbar .btn {
         width: 100%;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.5rem;
+        padding: 0.75rem;
       }
       
       .navbar .badge {
         width: 100%;
         text-align: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+      }
+      
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+      
+      .overlay.show {
+        display: block;
       }
     }
   `;
@@ -135,37 +214,49 @@ function cargarNavbar() {
   // Cargar datos del usuario
   const user = JSON.parse(localStorage.getItem('usuario')) || { nombre: 'Usuario' };
   
-  // HTML del navbar
+  // HTML del navbar con estructura responsive
   const navbarHTML = `
     <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-sm py-3 mb-4">
       <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="dashboard.html">
-          <img src="/src/logoMF.png" alt="Logo" width="100" style="object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px #0002;">
-          <span class="fs-4 ms-2">MyFinanza</span>
+          <img src="/src/logoMF.png" alt="Logo" width="50" style="object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px #0002;">
+          <span class="fs-5 ms-2">MyFinanza</span>
         </a>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-light text-primary fw-semibold px-3 py-2 fs-6 shadow-sm">
-            <i class="fas fa-user-circle me-1"></i>
-            Bienvenid@ <span id="nombreUsuario">${user.nombre}</span>
-          </span>
-          <a class="btn btn-primary fw-bold shadow-sm px-3 ${esDashboard ? 'active' : ''}" href="dashboard.html">
-            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-          </a>
-          <a class="btn btn-info fw-bold shadow-sm px-3 ${esIngresos ? 'active' : ''}" href="ingresos.html">
-            <i class="fas fa-hand-holding-usd me-1"></i> Ingresos
-          </a>
-          <a class="btn btn-success fw-bold shadow-sm px-3 ${esDeudores ? 'active' : ''}" href="deudores.html">
-            <i class="fas fa-users me-1"></i> Deudores
-          </a>
-          <a class="btn btn-warning fw-bold shadow-sm px-3 ${esHistorial ? 'active' : ''}" href="historial.html">
-            <i class="fas fa-history me-1"></i> Historial
-          </a>
-          <button id="logoutButton" class="btn btn-danger fw-bold shadow-sm px-3">
-            <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
+        
+        <button class="navbar-toggler" type="button" id="navbarToggler">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="navbar-collapse" id="navbarCollapse">
+          <button class="navbar-close" id="navbarClose">
+            <i class="fas fa-times"></i>
           </button>
+          
+          <div class="nav-items">
+            <span class="badge bg-light text-primary fw-semibold px-3 py-2 fs-6 shadow-sm">
+              <i class="fas fa-user-circle me-1"></i>
+              Bienvenid@ <span id="nombreUsuario">${user.nombre}</span>
+            </span>
+            <a class="btn btn-primary fw-bold shadow-sm px-3 ${esDashboard ? 'active' : ''}" href="dashboard.html">
+              <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+            </a>
+            <a class="btn btn-info fw-bold shadow-sm px-3 ${esIngresos ? 'active' : ''}" href="ingresos.html">
+              <i class="fas fa-hand-holding-usd me-1"></i> Ingresos
+            </a>
+            <a class="btn btn-success fw-bold shadow-sm px-3 ${esDeudores ? 'active' : ''}" href="deudores.html">
+              <i class="fas fa-users me-1"></i> Deudores
+            </a>
+            <a class="btn btn-warning fw-bold shadow-sm px-3 ${esHistorial ? 'active' : ''}" href="historial.html">
+              <i class="fas fa-history me-1"></i> Historial
+            </a>
+            <button id="logoutButton" class="btn btn-danger fw-bold shadow-sm px-3">
+              <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
+            </button>
+          </div>
         </div>
       </div>
     </nav>
+    <div class="overlay" id="navOverlay"></div>
   `;
   
   // Insertar el navbar en el contenedor
@@ -175,6 +266,33 @@ function cargarNavbar() {
   document.getElementById('logoutButton').addEventListener('click', () => {
     localStorage.removeItem('usuario');
     window.location.href = '/index.html';
+  });
+  
+  // Event listeners para el menú móvil
+  const navbarToggler = document.getElementById('navbarToggler');
+  const navbarClose = document.getElementById('navbarClose');
+  const navbarCollapse = document.getElementById('navbarCollapse');
+  const navOverlay = document.getElementById('navOverlay');
+  
+  navbarToggler.addEventListener('click', () => {
+    navbarCollapse.classList.add('show');
+    navOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+  });
+  
+  function closeMenu() {
+    navbarCollapse.classList.remove('show');
+    navOverlay.classList.remove('show');
+    document.body.style.overflow = ''; // Restore scrolling
+  }
+  
+  navbarClose.addEventListener('click', closeMenu);
+  navOverlay.addEventListener('click', closeMenu);
+  
+  // Close menu when clicking on a navigation link
+  const navLinks = navbarCollapse.querySelectorAll('a.btn');
+  navLinks.forEach(link => {
+    link.addEventListener('click', closeMenu);
   });
 }
 
