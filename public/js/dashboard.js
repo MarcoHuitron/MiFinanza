@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   document.getElementById('nombreUsuario').textContent = user.nombre;
 
-  // Elementos
   const listaTarjetas = document.getElementById('listaTarjetas');
   const listaCompras = document.getElementById('listaCompras');
   const openBtn = document.getElementById('openCardModal');
@@ -31,13 +30,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   let editMode = false;
   let currentEditId = null;
 
-  // Modales Bootstrap
   const cardModal = new bootstrap.Modal(document.getElementById('cardModal'));
   const compraModalInstance = new bootstrap.Modal(document.getElementById('compraModal'));
   const incomeModalInstance = new bootstrap.Modal(document.getElementById('incomeModal'));
   const confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
 
-  // Modal de ayuda
   const helpButton = document.getElementById('helpButton');
   const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
   const helpForm = document.getElementById('helpForm');
@@ -63,7 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           mensaje
         })
       });
-      // Cierra el modal y muestra mensaje de éxito
       bootstrap.Modal.getOrCreateInstance(document.getElementById('helpModal')).hide();
       alert('¡Gracias por tu mensaje! Pronto nos pondremos en contacto.');
     } catch (err) {
@@ -71,18 +67,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Abrir modales
   openBtn.addEventListener('click', () => cardModal.show());
   document.getElementById('openCompraModal').addEventListener('click', () => compraModalInstance.show());
   setIncomeButton.addEventListener('click', () => incomeModalInstance.show());
 
-  // Cerrar sesión
   logoutButton.addEventListener('click', () => {
     localStorage.removeItem('usuario');
     window.location.href = '/index.html';
   });
 
-  // Función para cargar tarjetas
   async function loadTarjetas() {
     try {
       const res = await fetch(`${API_URL}/tarjetas/${user.id}`);
@@ -118,7 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         '</div>';
       }
       
-      // Botones eliminar tarjeta
       document.querySelectorAll('.delete-tarjeta').forEach(button => {
         button.addEventListener('click', (e) => {
           e.stopPropagation(); 
@@ -140,7 +132,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Función para abrir el modal de confirmación
   let confirmCallback = null;
   function openConfirmModal(message, callback) {
     document.getElementById('confirmMessage').textContent = message;
@@ -152,7 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     confirmModalInstance.hide();
   };
 
-  // Función para cargar compras
   async function loadCompras() {
     try {
       const res = await fetch(`${API_URL}/compras/${user.id}`);
@@ -162,7 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (compras.length === 0) {
         listaCompras.innerHTML = '<div class="alert alert-info">No has registrado compras.</div>';
       } else {
-        // Create container for purchase cards
         listaCompras.innerHTML = '<div class="compra-container">' + 
           compras.map(c => {
             const meses = c.meses || 1;
@@ -170,17 +159,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tarjeta = c.tarjeta_nombre ? `${c.tarjeta_nombre} (${c.tarjeta_tipo || ''})` : `Tarjeta: ${c.tarjeta_id || c.tarjeta}`;
             const fecha = new Date(c.fecha).toLocaleDateString();
             
-            // Choose icons based on payment type
+
             const paymentIcon = meses === 1 ? 'fa-money-bill-wave' : 'fa-calendar-alt';
             const cardIcon = c.tarjeta_tipo === 'credito' ? 'fa-credit-card' : 'fa-money-check-alt';
             
-            // Calculate progress for installment payments
+
             const progressPercent = meses === 1 ? 100 : ((mesesPagados + 1) / meses) * 100;
             
-            // Different classes for different payment types
             const paymentClass = meses === 1 ? 'single-payment' : 'monthly-payment';
             
-            // Single payment
             return `
               <div class="compra-item ${paymentClass} ${c.pagada ? 'pagada' : ''}">
                 <div class="d-flex justify-content-between align-items-center">
@@ -228,7 +215,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }).join('') +
         '</div>';
 
-        // Calculate payment totals
         let totalCredito = 0;
         let mensualidadCredito = 0;
         let totalMensualidad = 0;
@@ -253,7 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
       
-      // Event listeners for delete buttons
       document.querySelectorAll('.delete-compra').forEach(btn => {
         btn.onclick = () => {
           const id = btn.dataset.id;
@@ -267,27 +252,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
       });
       
-      // Event listeners for edit buttons
       document.querySelectorAll('.edit-compra').forEach(btn => {
         btn.onclick = async () => {
-          // Get the purchase ID
           const purchaseId = btn.dataset.id;
           console.log("Editing purchase with ID:", purchaseId);
           
-          // Fetch the purchase data
           try {
             const response = await fetch(`${API_URL}/compras/compra/${purchaseId}`);
             const purchase = await response.json();
             
-            // Set edit mode
             editMode = true;
             currentEditId = purchaseId;
             
-            // Populate the form with existing data
             document.getElementById('compraDescripcion').value = purchase.descripcion;
             document.getElementById('compraMonto').value = purchase.monto;
             
-            // Select the correct card in the dropdown
             const cardSelect = document.getElementById('compraTarjeta');
             for (let i = 0; i < cardSelect.options.length; i++) {
               if (cardSelect.options[i].value === purchase.tarjeta_id) {
@@ -296,7 +275,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
             }
             
-            // Handle installment options if applicable
             if (purchase.meses > 1) {
               document.getElementById('creditoFields').style.display = 'block';
               const mesesSelect = document.getElementById('compraMeses');
@@ -310,10 +288,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               document.getElementById('creditoFields').style.display = 'none';
             }
             
-            // Update modal title
             document.querySelector('#compraModal .modal-title').textContent = 'Editar Compra';
             
-            // Show the modal
             compraModalInstance.show();
           } catch (error) {
             console.error('Error fetching purchase for edit:', error);
@@ -321,14 +297,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
       });
       
-      // Evento para marcar/desmarcar compras como pagadas
       document.querySelectorAll('.mark-paid').forEach(checkbox => {
         checkbox.addEventListener('change', async function() {
           const id = this.dataset.id;
           const pagada = this.checked;
           
           try {
-            // Actualiza visualmente mientras se procesa la petición
             const compraItem = this.closest('.compra-item');
             if (pagada) {
               compraItem.classList.add('pagada');
@@ -336,7 +310,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               compraItem.classList.remove('pagada');
             }
             
-            // Envía la actualización al servidor
             const response = await fetch(`${API_URL}/compras/${id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
@@ -352,9 +325,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           } catch (err) {
             console.error('Error al marcar como pagada:', err);
             alert('No se pudo actualizar el estado de la compra');
-            this.checked = !pagada; // Revierte el estado del checkbox
+            this.checked = !pagada;
             
-            // También revierte la clase visual
             const compraItem = this.closest('.compra-item');
             if (!pagada) {
               compraItem.classList.add('pagada');
@@ -371,7 +343,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Cargar tarjetas en el select con el atributo data-tipo
   async function loadTarjetasForCompra() {
     const res = await fetch(`${API_URL}/tarjetas/${user.id}`);
     const tarjetas = await res.json();
@@ -476,7 +447,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (editMode) {
         console.log("Updating purchase with ID:", currentEditId);
         
-        // Update existing purchase
         const response = await fetch(`${API_URL}/compras/${currentEditId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -490,26 +460,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         console.log("Update response status:", response.status);
-        // Check if the response is JSON before trying to parse it
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const responseData = await response.json();
           console.log("Update response data:", responseData);
         } else {
-          // Handle non-JSON response
           const textResponse = await response.text();
           console.error("Non-JSON response:", textResponse.substring(0, 100) + "...");
           throw new Error("Server returned non-JSON response. Please check server logs.");
         }
         
-        // Reset edit mode
         editMode = false;
         currentEditId = null;
         
-        // Reset modal title
         document.querySelector('#compraModal .modal-title').textContent = 'Agregar Compra';
       } else {
-        // Create new purchase (existing code)
         await fetch(`${API_URL}/compras`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -517,7 +482,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
       
-      // Common actions for both create and update
       compraForm.reset();
       creditoFields.style.display = 'none';
       compraModalInstance.hide();
@@ -552,14 +516,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadCompras();
         await calculateMonthlyExpenses();
         alert('¡Cierre de mes realizado! Puedes consultar el historial en la sección correspondiente.');
-        // Opcional: window.location.href = 'historial.html';
       } catch (err) {
         alert('Error al realizar el cierre de mes.');
       }
     }
   });
 
-  // Reset the form when the modal is closed
   document.getElementById('compraModal').addEventListener('hidden.bs.modal', () => {
     editMode = false;
     currentEditId = null;

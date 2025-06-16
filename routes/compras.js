@@ -65,7 +65,6 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
   const anio = now.getFullYear();
 
   try {
-    // 1. Mueve compras de débito o meses=1 al historial
     const comprasDebito = await Compra.find({ usuario_id: userId, meses: 1 });
     for (const compra of comprasDebito) {
       const tarjeta = await Tarjeta.findById(compra.tarjeta_id);
@@ -82,7 +81,6 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
       await compra.deleteOne();
     }
 
-    // 2. Para compras a meses, registra el pago mensual en el historial y actualiza meses_pagados
     const comprasMeses = await Compra.find({ usuario_id: userId, meses: { $gt: 1 } });
     for (const compra of comprasMeses) {
       const tarjeta = await Tarjeta.findById(compra.tarjeta_id);
@@ -105,6 +103,12 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
         await compra.save();
       }
     }
+
+    // Aquí agregas la actualización de pagada a false
+    await Compra.updateMany(
+      { usuario_id: userId, pagada: true },
+      { $set: { pagada: false } }
+    );
 
     res.json({ success: true });
   } catch (err) {
