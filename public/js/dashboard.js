@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                   </div>
                   ` : ''}
+                  ${c.nota ? `<div class="compra-nota"><i class="fas fa-sticky-note"></i> ${c.nota}</div>` : ''}
                 </div>
                 <div class="compra-actions">
                   <button class="edit-compra" data-id="${c._id || c.id}">
@@ -256,17 +257,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.onclick = async () => {
           const purchaseId = btn.dataset.id;
           console.log("Editing purchase with ID:", purchaseId);
-          
+
           try {
             const response = await fetch(`${API_URL}/compras/compra/${purchaseId}`);
             const purchase = await response.json();
-            
+
             editMode = true;
             currentEditId = purchaseId;
-            
+
             document.getElementById('compraDescripcion').value = purchase.descripcion;
             document.getElementById('compraMonto').value = purchase.monto;
-            
+            document.getElementById('compraNota').value = purchase.nota || '';
+
+            // Selecciona la tarjeta correcta
             const cardSelect = document.getElementById('compraTarjeta');
             for (let i = 0; i < cardSelect.options.length; i++) {
               if (cardSelect.options[i].value === purchase.tarjeta_id) {
@@ -274,22 +277,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 break;
               }
             }
-            
-            if (purchase.meses > 1) {
-              document.getElementById('creditoFields').style.display = 'block';
-              const mesesSelect = document.getElementById('compraMeses');
-              for (let i = 0; i < mesesSelect.options.length; i++) {
-                if (parseInt(mesesSelect.options[i].value) === purchase.meses) {
-                  mesesSelect.selectedIndex = i;
-                  break;
-                }
-              }
+
+            // Muestra el campo de meses si la tarjeta es de crédito
+            const selectedOption = cardSelect.options[cardSelect.selectedIndex];
+            const tipoTarjeta = selectedOption ? selectedOption.getAttribute('data-tipo') : '';
+            const creditoFields = document.getElementById('creditoFields');
+            if (tipoTarjeta === 'credito') {
+              creditoFields.style.display = 'block';
+              document.getElementById('compraMeses').value = purchase.meses || 1;
             } else {
-              document.getElementById('creditoFields').style.display = 'none';
+              creditoFields.style.display = 'none';
+              document.getElementById('compraMeses').value = '';
             }
-            
+
             document.querySelector('#compraModal .modal-title').textContent = 'Editar Compra';
-            
+
             compraModalInstance.show();
           } catch (error) {
             console.error('Error fetching purchase for edit:', error);
@@ -441,7 +443,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tarjetaId = compraTarjeta.value;
     const descripcion = compraForm.compraDescripcion.value;
     const monto = compraForm.compraMonto.value;
-    const meses = compraForm.compraMeses ? compraForm.compraMeses.value : 1;
+    const meses = compraForm.compraMeses && compraForm.compraMeses.value
+      ? parseInt(compraForm.compraMeses.value, 10)
+      : 1;
+    const nota = compraForm.compraNota ? compraForm.compraNota.value : ''; // <-- Añadido
 
     try {
       if (editMode) {
@@ -455,7 +460,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             tarjeta_id: tarjetaId, 
             descripcion, 
             monto, 
-            meses 
+            meses,
+            nota // <-- Añadido
           })
         });
         
@@ -467,74 +473,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
           const textResponse = await response.text();
           console.error("Non-JSON response:", textResponse.substring(0, 100) + "...");
-          throw new Error("Server returned non-JSON response. Please check server logs.");
         }
         
         editMode = false;
         currentEditId = null;
-        
-        document.querySelector('#compraModal .modal-title').textContent = 'Agregar Compra';
-      } else {
-        await fetch(`${API_URL}/compras`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ usuario_id: user.id, tarjeta_id: tarjetaId, descripcion, monto, meses })
-        });
-      }
-      
-      compraForm.reset();
-      creditoFields.style.display = 'none';
-      compraModalInstance.hide();
-      await loadCompras();
-      await calculateMonthlyExpenses();
-    } catch (err) {
-      console.error('Error processing purchase:', err);
-      alert(`Error: ${err.message}`);
-    }
-  });
-
-  incomeForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const ingresos = parseFloat(document.getElementById('monthlyIncome').value);
-    try {
-      await fetch(`${API_URL}/users/${user.id}/ingresos`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingresos })
-      });
-      incomeModalInstance.hide();
-      window.location.reload();
-    } catch (err) {
-      console.error('Error al guardar ingresos', err);
-    }
-  });
-
-  document.getElementById('cierreMesBtn').addEventListener('click', async () => {
-    if (confirm('¿Estás seguro de que deseas cerrar el mes? Las compras de este mes pasarán al historial.')) {
-      try {
-        await fetch(`${API_URL}/compras/reiniciar-mes/${user.id}`, { method: 'POST' });
+        compraForm.reset();
+        compraModalInstance.hide();
         await loadCompras();
         await calculateMonthlyExpenses();
-        alert('¡Cierre de mes realizado! Puedes consultar el historial en la sección correspondiente.');
-      } catch (err) {
-        alert('Error al realizar el cierre de mes.');
+      } else {
+        const response = await fetch(`${API_URL}/compras`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            usuario_id: user.id, 
+            tarjeta_id: tarjetaId, 
+            descripcion, 
+            monto, 
+            meses,
+            nota // <-- Añadido
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al guardar la compra');
+        }
+        
+        compraForm.reset();
+        compraModalInstance.hide();
+        await loadCompras();
+        await calculateMonthlyExpenses();
       }
+    } catch (err) {
+      console.error('Error guardando compra', err);
     }
   });
 
-  document.getElementById('compraModal').addEventListener('hidden.bs.modal', () => {
-    editMode = false;
-    currentEditId = null;
-    compraForm.reset();
-    document.querySelector('#compraModal .modal-title').textContent = 'Agregar Compra';
-    creditoFields.style.display = 'none';
-  });
-
-  
   await loadTarjetas();
-  await loadTarjetasForCompra();
   await loadCompras();
   await loadMonthlyIncome();
   await calculateMonthlyExpenses();
-
+  await loadTarjetasForCompra();
 });

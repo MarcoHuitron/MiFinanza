@@ -220,19 +220,22 @@
                   required
                 />
               </div>
+              <div class="mb-3">
+                <label for="compraNota" class="form-label">Nota (opcional)</label>
+                <textarea id="compraNota" name="compraNota" class="form-control" rows="2"></textarea>
+              </div>
               <div id="creditoFields" style="display: none">
                 <div class="mb-3">
-                  <label for="compraMeses" class="form-label">¿A meses?</label>
-                  <select
+                  <label for="compraMeses" class="form-label">Meses (2 o más)</label>
+                  <input
+                    type="number"
                     id="compraMeses"
                     name="compraMeses"
-                    class="form-select"
-                  >
-                    <option value="1">No</option>
-                    <option value="3">3 meses</option>
-                    <option value="6">6 meses</option>
-                    <option value="12">12 meses</option>
-                  </select>
+                    class="form-control"
+                    min="1"
+                    step="1"
+                    placeholder="Ej: 1, 3, 6, 12..."
+                  />
                 </div>
               </div>
             </div>

@@ -16,7 +16,8 @@ router.get('/:userId', async (req, res) => {
       meses: c.meses,
       meses_pagados: c.meses_pagados,
       tarjeta: c.tarjeta_id?.nombre || '',
-      pagada: c.pagada
+      pagada: c.pagada,
+      nota: c.nota || '' // <-- Añadido para enviar la nota al frontend
     }));
     res.json(result);
   } catch (err) {
@@ -26,7 +27,7 @@ router.get('/:userId', async (req, res) => {
 
 // POST /api/compras
 router.post('/', async (req, res) => {
-  const { usuario_id, tarjeta_id, descripcion, monto, meses } = req.body;
+  const { usuario_id, tarjeta_id, descripcion, monto, meses, nota } = req.body; // <-- Añade nota aquí
   console.log('Datos recibidos:', req.body);
   if (!usuario_id || !tarjeta_id || !descripcion || !monto) {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
@@ -37,7 +38,8 @@ router.post('/', async (req, res) => {
       tarjeta_id,
       descripcion,
       monto,
-      meses: meses || 1
+      meses: meses || 1,
+      nota: nota || '' // <-- Guarda la nota si viene
     });
     await compra.save();
     res.json({ success: true, id: compra._id });
@@ -120,22 +122,17 @@ router.post('/reiniciar-mes/:userId', async (req, res) => {
 // PUT /api/compras/:id
 router.put('/:id', async (req, res) => {
   try {
-    // Busca la compra primero para preservar campos existentes
     const compra = await Compra.findById(req.params.id);
     if (!compra) {
       return res.status(404).json({ error: 'Compra no encontrada' });
     }
-    
-    // Actualiza solo los campos que vienen en el body
     if (req.body.pagada !== undefined) compra.pagada = req.body.pagada;
     if (req.body.descripcion) compra.descripcion = req.body.descripcion;
     if (req.body.monto) compra.monto = req.body.monto;
     if (req.body.meses) compra.meses = req.body.meses;
     if (req.body.tarjeta_id) compra.tarjeta_id = req.body.tarjeta_id;
-    
-    // Guarda los cambios
+    if (req.body.nota !== undefined) compra.nota = req.body.nota; // <-- Permite actualizar la nota
     await compra.save();
-    
     res.json({ success: true, compra });
   } catch (e) {
     console.error('Error actualizando compra:', e);
